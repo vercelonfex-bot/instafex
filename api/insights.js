@@ -88,7 +88,7 @@ async function analyzeWithAI({ igUsername, followersCount, accountSeries, posts 
       .sort((a, b) => (b.impressions || b.reach || 0) - (a.impressions || a.reach || 0))
       .slice(0, 3);
 
-    const prompt = `Você é um estrategista sênior de crescimento no Instagram. Analise os dados reais do perfil @${igUsername} e retorne SOMENTE um JSON válido, sem texto adicional antes ou depois.
+    const prompt = `Você é um estrategista sênior de crescimento no Instagram. Analise os dados reais do perfil @${igUsername}.
 
 DADOS REAIS DO PERFIL:
 - Seguidores totais: ${followersCount != null ? followersCount.toLocaleString('pt-BR') : 'N/A'}
@@ -101,30 +101,10 @@ DADOS REAIS DO PERFIL:
 - Tipos de conteúdo: ${Object.entries(typeCount).map(([t, c]) => `${t}(${c})`).join(', ')}
 
 TOP 3 POSTS (por impressões):
-${topPosts.map((p, i) => `${i + 1}. [${p.mediaType}] "${p.caption?.slice(0, 80) || 'sem legenda'}" → 👁${p.impressions || p.reach || 0} ♥${p.likeCount} 💬${p.commentsCount} 🔖${p.saved || 0}`).join('\n')}
+${topPosts.map((p, i) => `${i + 1}. [${p.mediaType}] "${(p.caption?.slice(0, 80) || 'sem legenda').replace(/"/g, "'")}" - impressoes:${p.impressions || p.reach || 0} curtidas:${p.likeCount} comentarios:${p.commentsCount} salvamentos:${p.saved || 0}`).join('\n')}
 
-Retorne APENAS este JSON:
-{
-  "audiencia": {
-    "resumo": "2-3 frases analisando comportamento da audiência com base nos dados reais",
-    "insights": ["insight específico 1", "insight específico 2", "insight específico 3"]
-  },
-  "engajamento": {
-    "taxa": "${engRate || 'N/A'}%",
-    "classificacao": "Baixo",
-    "resumo": "2-3 frases avaliando alcance, engajamento e potencial de conversão com base nos dados reais",
-    "insights": ["insight 1", "insight 2", "insight 3"]
-  },
-  "oportunidades": [
-    {"titulo": "Oportunidade 1", "descricao": "ação concreta e específica de 1-2 frases"},
-    {"titulo": "Oportunidade 2", "descricao": "ação concreta e específica de 1-2 frases"},
-    {"titulo": "Oportunidade 3", "descricao": "ação concreta e específica de 1-2 frases"},
-    {"titulo": "Oportunidade 4", "descricao": "ação concreta e específica de 1-2 frases"}
-  ]
-}
-
-A classificação do engajamento deve ser: "Baixo" se < 1%, "Médio" se 1-3%, "Alto" se 3-6%, "Excelente" se > 6%.
-Seja específico com os dados reais, fale em português brasileiro, seja direto e prático.`;
+Classifique o engajamento como: Baixo (<1%), Medio (1-3%), Alto (3-6%), Excelente (>6%).
+Seja especifico com os dados reais, escreva em portugues brasileiro, seja direto e pratico.`;
 
     const response = await fetch(ANTHROPIC_API, {
       method: 'POST',
@@ -136,15 +116,56 @@ Seja específico com os dados reais, fale em português brasileiro, seja direto 
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1200,
+        tools: [{
+          name: 'instagram_analysis',
+          description: 'Retorna análise estratégica estruturada do perfil Instagram',
+          input_schema: {
+            type: 'object',
+            properties: {
+              audiencia: {
+                type: 'object',
+                properties: {
+                  resumo: { type: 'string', description: '2-3 frases sobre comportamento da audiência' },
+                  insights: { type: 'array', items: { type: 'string' }, description: '3 insights específicos sobre a audiência' }
+                },
+                required: ['resumo', 'insights']
+              },
+              engajamento: {
+                type: 'object',
+                properties: {
+                  taxa: { type: 'string', description: 'Taxa de engajamento como string ex: 0.54%' },
+                  classificacao: { type: 'string', enum: ['Baixo', 'Médio', 'Alto', 'Excelente'] },
+                  resumo: { type: 'string', description: '2-3 frases avaliando alcance e engajamento' },
+                  insights: { type: 'array', items: { type: 'string' }, description: '3 insights sobre engajamento e alcance' }
+                },
+                required: ['taxa', 'classificacao', 'resumo', 'insights']
+              },
+              oportunidades: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    titulo: { type: 'string' },
+                    descricao: { type: 'string', description: 'Ação concreta de 1-2 frases' }
+                  },
+                  required: ['titulo', 'descricao']
+                },
+                description: '4 oportunidades de crescimento concretas e acionáveis'
+              }
+            },
+            required: ['audiencia', 'engajamento', 'oportunidades']
+          }
+        }],
+        tool_choice: { type: 'tool', name: 'instagram_analysis' },
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
     const result = await response.json();
-    const text = result.content?.[0]?.text || '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return { analysis: null, analysisError: 'Claude não retornou JSON: ' + text.slice(0, 200) };
-    return { analysis: JSON.parse(jsonMatch[0]), analysisError: null };
+    if (result.error) return { analysis: null, analysisError: `Anthropic: ${result.error.message}` };
+    const toolUse = result.content?.find(b => b.type === 'tool_use');
+    if (!toolUse) return { analysis: null, analysisError: 'Sem resposta de tool use do Claude' };
+    return { analysis: toolUse.input, analysisError: null };
   } catch (e) {
     return { analysis: null, analysisError: e.message || 'Erro desconhecido na análise IA' };
   }
