@@ -70,8 +70,11 @@ export default async function handler(req, res) {
       expiresAt: Date.now() + expiresIn * 1000
     };
 
-    applyCookies(res, [sessionCookie(sessionData, expiresIn), clearStateCookie()]);
-    res.writeHead(302, { Location: '/?conectado=1' });
+    res.writeHead(302, {
+      'Set-Cookie': [sessionCookie(sessionData, expiresIn), clearStateCookie()],
+      'Location': '/?conectado=1',
+      'Cache-Control': 'no-store, max-age=0'
+    });
     res.end();
   } catch (err) {
     return redirectWithErr(res, 'Erro inesperado: ' + (err.message || 'desconhecido'));
@@ -79,6 +82,9 @@ export default async function handler(req, res) {
 }
 
 function redirectWithErr(res, msg) {
-  res.writeHead(302, { Location: '/?erro=' + encodeURIComponent(msg) });
+  res.writeHead(302, {
+    'Location': '/?erro=' + encodeURIComponent(msg),
+    'Cache-Control': 'no-store, max-age=0'
+  });
   res.end();
 }
