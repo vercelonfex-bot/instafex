@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
   try {
     const [accountMetrics, mediaRes, meRes] = await Promise.all([
-      safeFetch(`${GRAPH_IG}/${igUserId}/insights?metric=reach,impressions&period=day&metric_type=time_series&access_token=${accessToken}`),
+      safeFetch(`${GRAPH_IG}/${igUserId}/insights?metric=reach,total_interactions&period=day&metric_type=time_series&access_token=${accessToken}`),
       safeFetch(`${GRAPH_IG}/${igUserId}/media?fields=id,caption,media_type,timestamp,permalink,like_count,comments_count,thumbnail_url,media_url,insights.metric(impressions,reach,saved)&limit=12&access_token=${accessToken}`),
       safeFetch(`${GRAPH_IG}/${igUserId}?fields=followers_count,media_count&access_token=${accessToken}`)
     ]);
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     const followersCount = meRes?.followers_count ?? null;
     const mediaCount = meRes?.media_count ?? null;
 
-    const analysis = await analyzeWithAI({ igUsername, followersCount, accountSeries, posts });
+    const { analysis, analysisError } = await analyzeWithAI({ igUsername, followersCount, accountSeries, posts });
 
     return res.status(200).json({
       igUsername,
@@ -60,6 +60,7 @@ export default async function handler(req, res) {
       accountSeries,
       posts,
       analysis,
+      analysis_error: analysisError || null,
       account_metrics_warning: accountMetrics?.error ? accountMetrics.error.message : null,
       media_warning: mediaRes?.error ? mediaRes.error.message : null
     });
@@ -71,7 +72,7 @@ export default async function handler(req, res) {
 async function analyzeWithAI({ igUsername, followersCount, accountSeries, posts }) {
   try {
     const reachTotal = (accountSeries.reach || []).reduce((a, v) => a + (v.value || 0), 0);
-    const impressionsTotal = (accountSeries.impressions || []).reduce((a, v) => a + (v.value || 0), 0);
+    const interactionsTotal = (accountSeries.total_interactions || []).reduce((a, v) => a + (v.value || 0), 0);
     const totalLikes = posts.reduce((a, p) => a + p.likeCount, 0);
     const totalComments = posts.reduce((a, p) => a + p.commentsCount, 0);
     const totalSaved = posts.reduce((a, p) => a + (p.saved || 0), 0);
@@ -92,7 +93,7 @@ async function analyzeWithAI({ igUsername, followersCount, accountSeries, posts 
 DADOS REAIS DO PERFIL:
 - Seguidores totais: ${followersCount != null ? followersCount.toLocaleString('pt-BR') : 'N/A'}
 - Alcance total no período: ${reachTotal.toLocaleString('pt-BR')}
-- Impressões totais: ${impressionsTotal.toLocaleString('pt-BR')}
+- Interações totais no período: ${interactionsTotal.toLocaleString('pt-BR')}
 - Posts analisados: ${posts.length}
 - Taxa de engajamento média: ${engRate ? engRate + '%' : 'N/A'} (curtidas+comentários / seguidores)
 - Média de impressões por post: ${avgImpressions.toLocaleString('pt-BR')}
@@ -142,10 +143,10 @@ Seja específico com os dados reais, fale em português brasileiro, seja direto 
     const result = await response.json();
     const text = result.content?.[0]?.text || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
-  } catch {
-    return null;
+    if (!jsonMatch) return { analysis: null, analysisError: 'Claude não retornou JSON: ' + text.slice(0, 200) };
+    return { analysis: JSON.parse(jsonMatch[0]), analysisError: null };
+  } catch (e) {
+    return { analysis: null, analysisError: e.message || 'Erro desconhecido na análise IA' };
   }
 }
 

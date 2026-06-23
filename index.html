@@ -841,9 +841,9 @@ function renderEtapa2(d) {
 
   const series = d.accountSeries || {};
   const reachSeries = series.reach || [];
-  const impressionsSeries = series.impressions || [];
+  const interactionsSeries = series.total_interactions || [];
   const reachTotal = reachSeries.reduce((a, v) => a + (v.value || 0), 0);
-  const impressionsTotal = impressionsSeries.reduce((a, v) => a + (v.value || 0), 0);
+  const interactionsTotal = interactionsSeries.reduce((a, v) => a + (v.value || 0), 0);
 
   const postsHtml = (d.posts || []).length > 0 ? `
     <div class="posts-grid" style="margin-top:14px;">
@@ -868,14 +868,14 @@ function renderEtapa2(d) {
       <div class="mets">
         <div class="met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
         <div class="met"><div class="v">${d.followersCount != null ? fmt(d.followersCount) : '—'}</div><div class="l">Seguidores (total)</div></div>
-        <div class="met"><div class="v">${impressionsTotal > 0 ? fmt(impressionsTotal) : (d.posts ? d.posts.length : 0)}</div><div class="l">${impressionsTotal > 0 ? 'Impressões (período)' : 'Posts analisados'}</div></div>
+        <div class="met"><div class="v">${interactionsTotal > 0 ? fmt(interactionsTotal) : (d.posts ? d.posts.length : 0)}</div><div class="l">${interactionsTotal > 0 ? 'Interações (período)' : 'Posts analisados'}</div></div>
       </div>
       <div class="card-title" style="margin-top:18px;">Performance por publicação</div>
       ${postsHtml}
       ${warnings.length ? `<div style="margin-top:14px;font-size:11.5px;color:var(--text3);">⚠ Algumas métricas não puderam ser obtidas: ${warnings.join(' · ')}</div>` : ''}
       <button class="btn-s" style="margin-top:16px;width:100%;" onclick="disconnectInstagram()">Desconectar conta</button>
     </div>
-    ${renderInsightsAnalysis(d.analysis)}
+    ${renderInsightsAnalysis(d.analysis, d.analysis_error)}
     <div class="next-step-box">
       <div class="ns-t">✅ Etapa 2 concluída. Avance para a análise competitiva do mercado.</div>
       <button class="btn-main" onclick="runEtapa3()">Iniciar Análise de Concorrência (Etapa 3) →</button>
@@ -883,11 +883,11 @@ function renderEtapa2(d) {
   `;
 }
 
-function renderInsightsAnalysis(analysis) {
+function renderInsightsAnalysis(analysis, analysisError) {
   if (!analysis) return `
     <div class="card" style="border-color:var(--border2);">
       <div class="card-title">Análise de IA — Não disponível</div>
-      <div style="font-size:13px;color:var(--text3);">A análise por inteligência artificial não pôde ser gerada neste momento.</div>
+      <div style="font-size:13px;color:var(--text3);">${analysisError ? '⚠ ' + analysisError : 'A análise por inteligência artificial não pôde ser gerada neste momento.'}</div>
     </div>`;
 
   const clsColor = { 'Baixo': 'var(--bad)', 'Médio': 'var(--warn)', 'Alto': 'var(--good)', 'Excelente': 'var(--cyan-bright)' };
