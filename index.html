@@ -365,6 +365,61 @@ body {
   .app { padding: 0 12px 70px; }
   .card { padding: 18px; }
 }
+
+/* ── INLINE LOADING ── */
+.inline-load { display: flex; align-items: center; gap: 12px; padding: 24px 0; color: var(--text2); font-size: 13px; }
+.inline-spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── COMPETITION CARDS ── */
+.comp-grid { display: flex; flex-direction: column; gap: 10px; }
+.comp-card { background: var(--bg3); border-radius: var(--rsm); border: 1px solid var(--border); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+.comp-rank { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--border2); flex-shrink: 0; width: 32px; text-align: center; line-height: 1; padding-top: 4px; }
+.comp-body { flex: 1; }
+.comp-handle { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.comp-handle a { color: inherit; text-decoration: none; }
+.comp-handle a:hover { color: var(--cyan-bright); }
+.comp-size { font-size: 12px; color: var(--text3); margin-bottom: 5px; }
+.comp-tipo { font-size: 12.5px; color: var(--text2); margin-bottom: 8px; line-height: 1.5; }
+.comp-dif { font-size: 12px; color: var(--cyan-bright); font-style: italic; margin-top: 6px; }
+.comp-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.comp-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 6px; background: var(--cyan-dim); color: var(--cyan); font-weight: 600; }
+.comp-tag.bad { background: rgba(240,98,92,0.08); color: var(--bad); }
+
+.bench-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.bench-item { background: var(--bg3); border-radius: var(--rsm); padding: 14px; }
+.bench-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 5px; }
+.bench-value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+.opp-list { display: flex; flex-direction: column; gap: 8px; }
+.opp-i { display: flex; gap: 10px; align-items: flex-start; background: rgba(74,222,156,0.05); border: 1px solid rgba(74,222,156,0.15); border-radius: var(--rsm); padding: 12px 14px; font-size: 13px; color: var(--text2); }
+.opp-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(74,222,156,0.15); color: var(--good); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+/* ── QUIZ ── */
+.quiz-q { margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+.quiz-q:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.quiz-label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.quiz-num { display: inline-flex; align-items: center; justify-content: center; background: var(--cyan-dim); color: var(--cyan-bright); border-radius: 50%; width: 22px; height: 22px; font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opts.quiz-multi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quiz-opt { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); padding: 11px 14px; cursor: pointer; transition: border-color 0.15s; font-size: 13.5px; color: var(--text2); }
+.quiz-opt:hover { border-color: var(--border2); color: var(--text); }
+.quiz-opt input[type=radio], .quiz-opt input[type=checkbox] { accent-color: var(--cyan); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+.quiz-input { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); color: var(--text); font-size: 14px; font-family: inherit; padding: 12px 14px; outline: none; width: 100%; transition: all 0.18s; }
+.quiz-input:focus { border-color: var(--cyan); background: var(--bg4); box-shadow: 0 0 0 3px var(--cyan-dim); }
+.quiz-input::placeholder { color: var(--text3); }
+
+/* ── ETAPA 5 HEADER ── */
+.etapa5-header { background: linear-gradient(135deg, var(--cyan-dim), rgba(74,222,156,0.05)); border: 1px solid var(--border2); border-radius: var(--r); padding: 20px 24px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+.etapa5-badge { background: var(--good); color: var(--bg-deep); border-radius: var(--rsm); padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; flex-shrink: 0; }
+.etapa5-title { font-family: var(--serif); font-size: 18px; font-weight: 600; }
+.etapa5-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+@media (max-width:600px) {
+  .bench-grid { grid-template-columns: 1fr; }
+  .quiz-opts.quiz-multi { grid-template-columns: 1fr; }
+  .comp-card { flex-direction: column; gap: 8px; }
+}
 </style>
 </head>
 <body>
@@ -401,6 +456,10 @@ body {
         <label>@ do Instagram</label>
         <input type="text" id="username" placeholder="@nomedocliente" />
       </div>
+      <div class="field">
+        <label>Nicho do perfil</label>
+        <input type="text" id="niche" placeholder="Ex: Fitness, Gastronomia, Moda, Finanças, Beleza..." />
+      </div>
     </div>
 
     <div class="err" id="err"></div>
@@ -426,7 +485,10 @@ body {
   <div id="result">
     <div id="result-inner"></div>
     <div id="etapa2-area"></div>
-    <div class="actions">
+    <div id="etapa3-area"></div>
+    <div id="etapa4-area"></div>
+    <div id="etapa5-area"></div>
+    <div class="actions" id="result-actions" style="display:none;">
       <button class="btn-s" onclick="reset()">← Nova análise</button>
       <button class="btn-s p" onclick="exportPDF()">⬇ Exportar relatório</button>
     </div>
@@ -441,7 +503,9 @@ const LOAD_MESSAGES = [
   'Identificando posicionamento e tom de comunicação'
 ];
 let loadMsgInterval;
-let etapa1Data = null; // guarda { profile, positioning } para reuso nas próximas etapas
+let etapa1Data = null;
+let etapa3Data = null;
+let quizAnswers = null;
 
 function n(s) { return parseInt((s||'0').replace(/\D/g,'')) || 0; }
 function fmt(v) { return v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(v); }
@@ -491,8 +555,10 @@ function resetProgress() {
 
 async function runEtapa1() {
   const username = document.getElementById('username').value.trim();
+  const niche = document.getElementById('niche').value.trim();
   document.getElementById('err').style.display = 'none';
   if (!username) { showErr('Informe o @ do Instagram.'); return; }
+  if (!niche) { showErr('Informe o nicho do perfil.'); return; }
 
   document.getElementById('form-area').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
@@ -533,6 +599,7 @@ async function runEtapa1() {
     return;
   }
 
+  profile.niche = niche;
   if (profile.followersCount > 0 && profile.avgLikes > 0) {
     profile.engagementRate = (((profile.avgLikes + profile.avgComments) / profile.followersCount) * 100).toFixed(2);
   }
@@ -558,6 +625,8 @@ async function runEtapa1() {
   stopLoadingMessages();
   finishProgress();
   etapa1Data = { profile, positioning };
+  etapa3Data = null;
+  quizAnswers = null;
   localStorage.setItem('instafex_etapa1', JSON.stringify(etapa1Data));
   setTimeout(() => {
     renderEtapa1(profile, positioning);
@@ -657,12 +726,18 @@ function renderEtapa1(p, pos) {
     ${positioningHtml}
 
     <div class="next-step-box" id="etapa1-next-box">
-      <div class="ns-t">✅ Etapa 1 concluída. Para a Etapa 2 (Análise Profunda), conecte a conta pelo login oficial do Instagram — você será redirecionado para a tela do Facebook/Instagram e nunca digita a senha aqui no site.</div>
-      <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram →</button>
+      <div class="ns-t">✅ Etapa 1 concluída. Para métricas internas avançadas, conecte a conta via login oficial — ou avance direto para a análise de concorrência.</div>
+      <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram (Etapa 2) →</button>
+      <button class="btn-s" style="margin-top:10px;width:100%;" onclick="skipToEtapa3()">Pular para Análise de Concorrência →</button>
     </div>
   `;
 
   document.getElementById('result-inner').innerHTML = html;
+  document.getElementById('etapa2-area').innerHTML = '';
+  document.getElementById('etapa3-area').innerHTML = '';
+  document.getElementById('etapa4-area').innerHTML = '';
+  document.getElementById('etapa5-area').innerHTML = '';
+  document.getElementById('result-actions').style.display = 'none';
   document.getElementById('result').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -773,8 +848,8 @@ function renderEtapa2(d) {
       <button class="btn-s" style="margin-top:16px;width:100%;" onclick="disconnectInstagram()">Desconectar conta</button>
     </div>
     <div class="next-step-box">
-      <div class="ns-t">✅ Etapa 2 concluída. A Etapa 3 (Análise de Concorrência) entra em seguida.</div>
-      <button class="btn-locked" disabled>Etapa 3 — Análise de Concorrência (em construção)</button>
+      <div class="ns-t">✅ Etapa 2 concluída. Avance para a análise competitiva do mercado.</div>
+      <button class="btn-main" onclick="runEtapa3()">Iniciar Análise de Concorrência (Etapa 3) →</button>
     </div>
   `;
 }
@@ -785,11 +860,11 @@ async function disconnectInstagram() {
   setStepperState(2);
   const next = document.getElementById('result-inner');
   if (next && !document.getElementById('etapa1-next-box')) {
-    // se o botão de conectar já tinha sido removido, recoloca
     next.insertAdjacentHTML('beforeend', `
       <div class="next-step-box" id="etapa1-next-box">
-        <div class="ns-t">Conta desconectada. Conecte novamente quando quiser ver a Etapa 2.</div>
-        <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram →</button>
+        <div class="ns-t">Conta desconectada. Conecte novamente para ver métricas internas, ou avance para a análise de concorrência.</div>
+        <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram (Etapa 2) →</button>
+        <button class="btn-s" style="margin-top:10px;width:100%;" onclick="skipToEtapa3()">Pular para Análise de Concorrência →</button>
       </div>`);
   }
 }
@@ -930,13 +1005,26 @@ function renderFinalReport(r, p) {
     </div>` : ''}
   `;
 
-  document.getElementById('result-inner').innerHTML = html;
+  const etapa5 = document.getElementById('etapa5-area');
+  etapa5.innerHTML = `
+    <div class="etapa5-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <span class="etapa5-badge">Etapa 5 — Entrega Final</span>
+        </div>
+        <div class="etapa5-title">Documento Estratégico Completo</div>
+        <div class="etapa5-sub">Gerado pela IA OnFeX com base em todas as etapas anteriores</div>
+      </div>
+    </div>
+    ${html}
+  `;
+  document.getElementById('result-actions').style.display = 'flex';
   document.getElementById('result').style.display = 'block';
 
   if (calendarData.length > 0) renderCalDay(1);
 
   setTimeout(() => document.querySelectorAll('.bar-f').forEach(el => { el.style.width = el.dataset.w + '%'; }), 150);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  etapa5.scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderCalDay(day) {
@@ -970,7 +1058,8 @@ function navCalDay(delta) {
 
 function exportPDF() {
   const handle = document.getElementById('username')?.value?.replace('@','') || 'perfil';
-  const el = document.getElementById('result-inner');
+  const etapa5 = document.getElementById('etapa5-area');
+  const el = etapa5?.innerHTML ? etapa5 : document.getElementById('result-inner');
   const opt = {
     margin: [10,12,10,12],
     filename: `diagnostico-onfex-${handle}.pdf`,
@@ -982,11 +1071,260 @@ function exportPDF() {
   html2pdf().set(opt).from(el).save();
 }
 
+/* ───────────── ETAPA 3 — Análise de Concorrência ───────────── */
+
+function skipToEtapa3() {
+  document.getElementById('etapa1-next-box')?.remove();
+  runEtapa3();
+}
+
+async function runEtapa3() {
+  if (!etapa1Data?.profile) return;
+  const profile = etapa1Data.profile;
+  const box = document.getElementById('etapa3-area');
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-title">Etapa 3 · Análise de Concorrência</div>
+      <div class="inline-load">
+        <div class="inline-spinner"></div>
+        <span>Mapeando concorrentes no nicho <strong>${profile.niche}</strong>... (pode levar 1-2 min)</span>
+      </div>
+    </div>`;
+  box.scrollIntoView({ behavior: 'smooth' });
+  setStepperState(3);
+
+  try {
+    const r = await fetch('/api/competition', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData: profile })
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) throw new Error(data.error || 'Erro na análise de concorrência.');
+    etapa3Data = data;
+    renderEtapa3(data, profile);
+    setStepperState(4);
+  } catch (e) {
+    box.innerHTML = `
+      <div class="card">
+        <div class="card-title">Etapa 3 · Análise de Concorrência</div>
+        <div class="err" style="display:block;">⚠ ${e.message}</div>
+        <button class="btn-main" style="margin-top:12px;" onclick="runEtapa3()">Tentar novamente</button>
+      </div>`;
+  }
+}
+
+function renderEtapa3(d, profile) {
+  const box = document.getElementById('etapa3-area');
+
+  const compsHtml = (d.concorrentes || []).map((c, i) => {
+    const handle = c.perfil.startsWith('@') ? c.perfil : '@' + c.perfil;
+    const slug = handle.replace('@', '');
+    return `
+      <div class="comp-card">
+        <div class="comp-rank">${String(i + 1).padStart(2, '0')}</div>
+        <div class="comp-body">
+          <div class="comp-handle">
+            <a href="https://instagram.com/${slug}" target="_blank" rel="noopener">${handle} ↗</a>
+          </div>
+          <div class="comp-size">${c.seguidores_estimados || ''}</div>
+          <div class="comp-tipo">${c.tipo_conteudo || ''}</div>
+          ${c.pontos_fortes?.length ? `<div class="comp-tags">${c.pontos_fortes.map(p => `<span class="comp-tag">${p}</span>`).join('')}</div>` : ''}
+          ${c.pontos_fracos?.length ? `<div class="comp-tags">${c.pontos_fracos.map(p => `<span class="comp-tag bad">${p}</span>`).join('')}</div>` : ''}
+          ${c.diferencial ? `<div class="comp-dif">"${c.diferencial}"</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  const bench = d.benchmark || {};
+  const oppsHtml = (d.oportunidades || []).map((o, i) => `
+    <div class="opp-i"><div class="opp-num">${i + 1}</div><span>${o}</span></div>`).join('');
+
+  const difHtml = (d.diferenciais_possiveis || []).map(df => `
+    <div class="obs-i"><div class="dotc"></div><span>${df}</span></div>`).join('');
+
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-title">Etapa 3 · Análise de Concorrência — Nicho: ${profile.niche}</div>
+      <div class="comp-grid">${compsHtml}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Benchmark do mercado</div>
+      <div class="bench-grid">
+        <div class="bench-item">
+          <div class="bench-label">Engajamento médio</div>
+          <div class="bench-value">${bench.media_engajamento_nicho || '—'}</div>
+        </div>
+        <div class="bench-item">
+          <div class="bench-label">Frequência média</div>
+          <div class="bench-value">${bench.frequencia_media_posts || '—'}</div>
+        </div>
+        <div class="bench-item">
+          <div class="bench-label">Formatos dominantes</div>
+          <div class="bench-value">${(bench.formatos_dominantes || []).join(', ') || '—'}</div>
+        </div>
+        <div class="bench-item">
+          <div class="bench-label">Temas em alta</div>
+          <div class="bench-value">${(bench.temas_em_alta || []).join(' · ') || '—'}</div>
+        </div>
+      </div>
+      ${d.mapa_posicionamento ? `<div style="margin-top:14px;font-size:13px;color:var(--text2);line-height:1.7;padding-top:14px;border-top:1px solid var(--border);">${d.mapa_posicionamento}</div>` : ''}
+    </div>
+
+    ${oppsHtml ? `
+    <div class="card">
+      <div class="card-title">Oportunidades identificadas</div>
+      <div class="opp-list">${oppsHtml}</div>
+    </div>` : ''}
+
+    ${difHtml ? `
+    <div class="card">
+      <div class="card-title">Diferenciais possíveis para @${profile.username}</div>
+      <div class="obs-list">${difHtml}</div>
+    </div>` : ''}
+
+    <div class="next-step-box">
+      <div class="ns-t">✅ Etapa 3 concluída. Responda ao diagnóstico estratégico para gerar o planejamento personalizado.</div>
+      <button class="btn-main" onclick="renderQuiz()">Iniciar Planejamento Estratégico (Etapa 4) →</button>
+    </div>
+  `;
+}
+
+/* ───────────── ETAPA 4 — Quiz + Geração do Planejamento ───────────── */
+
+function renderQuiz() {
+  const box = document.getElementById('etapa4-area');
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-title">Etapa 4 · Diagnóstico Estratégico</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6;">Responda às perguntas abaixo para que a IA personalize completamente seu planejamento.</p>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">1</span>Qual o tempo disponível para gravações?</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="q1" value="Menos de 1h por dia"> Menos de 1h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="1 a 3h por dia"> 1 a 3h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="Mais de 3h por dia"> Mais de 3h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="Apenas fins de semana"> Apenas fins de semana</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">2</span>Quem será responsável pela criação dos conteúdos?</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="q2" value="Eu mesmo(a)"> Eu mesmo(a)</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Equipe interna"> Equipe interna</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Agência ou freelancer"> Agência ou freelancer</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Misto (eu + terceiros)"> Misto (eu + terceiros)</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">3</span>Quais perfis ou marcas mais se aproximam da sua comunicação desejada?</div>
+        <input type="text" class="quiz-input" id="q3" placeholder="Ex: @leticiagattos, @gustavorocha, Marca X..." />
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">4</span>Quais são os objetivos principais do projeto?</div>
+        <div class="quiz-opts quiz-multi">
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Gerar vendas diretas"> Gerar vendas diretas</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Aumentar audiência"> Aumentar audiência</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Fortalecer a marca"> Fortalecer a marca</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Atrair parcerias"> Atrair parcerias</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Educar o público"> Educar o público</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Lançar um produto/serviço"> Lançar um produto/serviço</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">5</span>Quais produtos ou serviços possuem maior prioridade?</div>
+        <input type="text" class="quiz-input" id="q5" placeholder="Ex: Curso online de finanças, Consultoria 1:1, Produto físico X..." />
+      </div>
+
+      <button class="btn-main" style="margin-top:8px;" onclick="submitEtapa4()">Gerar Planejamento Estratégico Completo →</button>
+      <div class="err" id="quiz-err" style="margin-top:10px;"></div>
+    </div>
+  `;
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function submitEtapa4() {
+  const q1 = document.querySelector('input[name="q1"]:checked')?.value || '';
+  const q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
+  const q3 = document.getElementById('q3')?.value?.trim() || 'Não informado';
+  const q4 = [...document.querySelectorAll('input[name="q4"]:checked')].map(i => i.value);
+  const q5 = document.getElementById('q5')?.value?.trim() || 'Não informado';
+
+  const errEl = document.getElementById('quiz-err');
+  if (!q1 || !q2) {
+    errEl.textContent = '⚠ Responda pelo menos as perguntas 1 e 2 para continuar.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  quizAnswers = {
+    tempo_gravacoes: q1,
+    responsavel_conteudo: q2,
+    perfis_referencia: q3,
+    objetivos: q4.length ? q4 : ['Não especificado'],
+    produto_prioritario: q5
+  };
+
+  const box = document.getElementById('etapa4-area');
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-title">Etapa 4 · Gerando Planejamento Estratégico</div>
+      <div class="inline-load">
+        <div class="inline-spinner"></div>
+        <span>Gerando planejamento personalizado com IA OnFeX... (pode levar até 3 minutos)</span>
+      </div>
+    </div>`;
+  setStepperState(5);
+
+  const profileData = { ...(etapa1Data?.profile || {}), quizAnswers };
+
+  try {
+    const r = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData })
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) throw new Error(data.error || 'Erro ao gerar planejamento.');
+
+    box.innerHTML = `<div class="card" style="text-align:center;padding:20px;">
+      <div style="font-size:28px;margin-bottom:8px;">✅</div>
+      <div style="font-size:15px;font-weight:600;color:var(--good);">Planejamento gerado com sucesso!</div>
+    </div>`;
+
+    renderFinalReport(data, profileData);
+    setStepperState(6);
+  } catch (e) {
+    box.innerHTML = `
+      <div class="card">
+        <div class="card-title">Etapa 4 · Planejamento Estratégico</div>
+        <div class="err" style="display:block;">⚠ ${e.message}</div>
+        <button class="btn-main" style="margin-top:12px;" onclick="submitEtapa4()">Tentar novamente</button>
+      </div>`;
+    setStepperState(4);
+  }
+}
+
 function reset() {
   document.getElementById('result').style.display = 'none';
   document.getElementById('form-area').style.display = 'block';
   document.getElementById('err').style.display = 'none';
+  document.getElementById('result-inner').innerHTML = '';
   document.getElementById('etapa2-area').innerHTML = '';
+  document.getElementById('etapa3-area').innerHTML = '';
+  document.getElementById('etapa4-area').innerHTML = '';
+  document.getElementById('etapa5-area').innerHTML = '';
+  document.getElementById('result-actions').style.display = 'none';
+  etapa1Data = null;
+  etapa3Data = null;
+  quizAnswers = null;
   setStepperState(1);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

@@ -8,6 +8,9 @@
     },
     "api/apify.js": {
       "maxDuration": 280
+    },
+    "api/competition.js": {
+      "maxDuration": 120
     }
   }
 }

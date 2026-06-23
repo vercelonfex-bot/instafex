@@ -26,6 +26,16 @@ async function mainHandler(req, res) {
     ? (((profileData.avgLikes + profileData.avgComments) / profileData.followersCount) * 100).toFixed(2)
     : null;
 
+  const quiz = profileData.quizAnswers;
+  const quizContext = quiz ? `
+
+DIAGNÓSTICO DO CLIENTE (respostas ao questionário estratégico — USE para personalizar completamente o plano):
+- Tempo disponível para gravações: ${quiz.tempo_gravacoes}
+- Responsável pela criação de conteúdo: ${quiz.responsavel_conteudo}
+- Perfis/marcas de referência de comunicação: ${quiz.perfis_referencia}
+- Objetivos principais do projeto: ${quiz.objetivos.join(', ')}
+- Produto ou serviço prioritário: ${quiz.produto_prioritario}` : '';
+
   const prompt = `Você é um consultor sênior de estratégia digital especializado em Instagram, contratado pela OnFeX para gerar diagnósticos premium de perfis.
 
 Pesquise na web por perfis reais e relevantes do Instagram no nicho "${profileData.niche}" no Brasil antes de responder (ex: busque "melhores perfis instagram ${profileData.niche}", "influenciadores ${profileData.niche} instagram brasil"). Use os resultados para identificar 10 perfis reais e ativos, relevantes ao nicho.
@@ -41,7 +51,7 @@ PERFIL ANALISADO:
 - Média comentários: ${profileData.avgComments || 'não informado'}
 - Engajamento: ${engRate ? engRate + '%' : 'não calculado'}
 - Verificado: ${profileData.isVerified ? 'Sim' : 'Não'}
-- Highlights: ${profileData.highlightCount || 0}
+- Highlights: ${profileData.highlightCount || 0}${quizContext}
 
 Depois de pesquisar, responda SOMENTE com um bloco JSON válido. Não inclua nenhum texto, explicação ou comentário antes ou depois do JSON — sua última mensagem deve conter exclusivamente o JSON abaixo preenchido:
 
