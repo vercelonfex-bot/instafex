@@ -142,15 +142,17 @@ Seja especifico com os dados reais, escreva em portugues brasileiro, seja direto
               },
               oportunidades: {
                 type: 'array',
+                minItems: 4,
+                maxItems: 4,
                 items: {
                   type: 'object',
                   properties: {
-                    titulo: { type: 'string' },
-                    descricao: { type: 'string', description: 'Ação concreta de 1-2 frases' }
+                    titulo: { type: 'string', description: 'Título curto da oportunidade' },
+                    descricao: { type: 'string', description: 'Ação concreta de 1-2 frases, específica para este perfil' }
                   },
                   required: ['titulo', 'descricao']
                 },
-                description: '4 oportunidades de crescimento concretas e acionáveis'
+                description: 'Exatamente 4 oportunidades de crescimento concretas baseadas nos dados reais'
               }
             },
             required: ['audiencia', 'engajamento', 'oportunidades']

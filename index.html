@@ -694,9 +694,9 @@ function renderEtapa1(p, pos) {
 
   const html = `
     <div class="profile-hero">
-      <div class="avatar" style="font-size:${p.profilePicUrl?'0':'inherit'};">
+      <div class="avatar">
         ${init}
-        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="@${handle}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;font-size:17px;" onerror="this.remove();this.parentElement.style.fontSize='inherit'">` : ''}
+        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
       </div>
       <div class="pinfo">
         <div class="handle">@${handle}</div>
@@ -962,9 +962,9 @@ function renderFinalReport(r, p) {
 
   let html = `
     <div class="profile-hero">
-      <div class="avatar" style="font-size:${p.profilePicUrl?'0':'inherit'};">
+      <div class="avatar">
         ${init}
-        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="@${handle}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;font-size:17px;" onerror="this.remove();this.parentElement.style.fontSize='inherit'">` : ''}
+        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
       </div>
       <div class="pinfo">
         <div class="handle">@${handle}</div>
