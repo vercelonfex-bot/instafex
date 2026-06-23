@@ -756,7 +756,6 @@ async function initFromUrl() {
   const conectado = params.get('conectado');
   if (!erro && !conectado) return;
 
-  // Restaura a Etapa 1 salva localmente, pra não perder o contexto após o redirect do OAuth
   const saved = localStorage.getItem('instafex_etapa1');
   if (saved) {
     try {
@@ -764,6 +763,18 @@ async function initFromUrl() {
       document.getElementById('form-area').style.display = 'none';
       renderEtapa1(etapa1Data.profile, etapa1Data.positioning);
     } catch {}
+  } else {
+    // localStorage vazio (outro navegador, aba incógnita, etc.) — mostra área de resultado com instrução
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('result-inner').innerHTML = `
+      <div class="next-step-box" style="margin-bottom:14px;">
+        <div class="ns-t">${conectado
+          ? '✅ Instagram conectado! Para continuar, informe o @ e o nicho do perfil abaixo.'
+          : '⚠ Retorno do Instagram detectado. Informe o @ e nicho para iniciar a análise.'
+        }</div>
+        <button class="btn-s" style="width:100%;margin-top:8px;" onclick="showFormFromReturn()">← Inserir @ e nicho para continuar</button>
+      </div>`;
+    document.getElementById('result').style.display = 'block';
   }
 
   if (erro) {
@@ -772,6 +783,13 @@ async function initFromUrl() {
     await loadEtapa2Insights();
   }
   history.replaceState(null, '', window.location.pathname);
+}
+
+function showFormFromReturn() {
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('result-inner').innerHTML = '';
+  document.getElementById('form-area').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function maybeAutoLoadEtapa2() {
@@ -788,14 +806,22 @@ async function maybeAutoLoadEtapa2() {
 function showEtapa2Error(msg) {
   const box = document.getElementById('etapa2-area');
   if (!box) return;
+  document.getElementById('result').style.display = 'block';
   box.innerHTML = `
-    <div class="err" style="display:block;">⚠ ${msg}</div>
-    <button class="btn-main" style="margin-top:10px;" onclick="connectInstagram()">Tentar conectar novamente</button>`;
+    <div class="card">
+      <div class="card-title">Etapa 2 · Análise Profunda</div>
+      <div class="err" style="display:block;">⚠ ${msg}</div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn-s" style="flex:1;" onclick="connectInstagram()">Tentar conectar novamente</button>
+        <button class="btn-s" style="flex:1;" onclick="skipToEtapa3()">Pular para Concorrência →</button>
+      </div>
+    </div>`;
 }
 
 async function loadEtapa2Insights() {
   const box = document.getElementById('etapa2-area');
   if (!box) return;
+  document.getElementById('result').style.display = 'block';
   box.innerHTML = `<div class="card"><div class="card-title">Etapa 2 · Análise Profunda</div><div style="font-size:13px;color:var(--text2);">Carregando métricas internas da conta conectada...</div></div>`;
 
   try {
