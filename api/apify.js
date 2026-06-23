@@ -113,7 +113,7 @@ async function mainHandler(req, res) {
       fullName: profile.fullName || '',
       biography: profile.biography || '',
       followersCount: profile.followersCount || 0,
-      followingCount: profile.followingCount || 0,
+      followingCount: profile.followingCount ?? profile.followsCount ?? profile.following ?? 0,
       postsCount: profile.postsCount || 0,
       isVerified: profile.verified || false,
       externalUrl: profile.externalUrl || '',

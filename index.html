@@ -175,6 +175,7 @@ body {
   width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
   background: var(--bg-deep); border: 1px solid var(--border2);
   display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
   font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--cyan-bright);
   position: relative; z-index: 1;
 }
@@ -693,7 +694,10 @@ function renderEtapa1(p, pos) {
 
   const html = `
     <div class="profile-hero">
-      <div class="avatar">${init}</div>
+      <div class="avatar" style="font-size:${p.profilePicUrl?'0':'inherit'};">
+        ${init}
+        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="@${handle}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;font-size:17px;" onerror="this.remove();this.parentElement.style.fontSize='inherit'">` : ''}
+      </div>
       <div class="pinfo">
         <div class="handle">@${handle}</div>
         <div class="sub">${p.fullName || ''}${p.businessCategoryName ? ' · ' + p.businessCategoryName : ''}</div>
@@ -958,7 +962,10 @@ function renderFinalReport(r, p) {
 
   let html = `
     <div class="profile-hero">
-      <div class="avatar">${init}</div>
+      <div class="avatar" style="font-size:${p.profilePicUrl?'0':'inherit'};">
+        ${init}
+        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="@${handle}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;font-size:17px;" onerror="this.remove();this.parentElement.style.fontSize='inherit'">` : ''}
+      </div>
       <div class="pinfo">
         <div class="handle">@${handle}</div>
         <div class="sub">${p.niche || ''}</div>
