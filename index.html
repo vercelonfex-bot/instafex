@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 <title>InstaFex — OnFeX Technology</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -45,21 +46,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
-.sidebar-brandmark {
-  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-  background: var(--bg-deep); border: 1px solid var(--border2);
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
+.sidebar-logo-name {
+  font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.5px;
+  line-height: 1; color: var(--text);
 }
-.sidebar-brandmark::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(111,203,236,0.5) 0.5px,transparent 0.5px), linear-gradient(90deg,rgba(111,203,236,0.5) 0.5px,transparent 0.5px);
-  background-size: 5px 5px; transform: skewY(-6deg) scale(1.3); opacity: 0.5;
-}
-.sidebar-brandmark span { position: relative; font-family: var(--serif); font-weight: 700; font-size: 13px; color: var(--text); z-index: 1; }
-.sidebar-logo-text { flex: 1; min-width: 0; }
-.sidebar-logo-name { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.1; }
-.sidebar-logo-sub { font-size: 9.5px; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-top: 1px; }
+.sidebar-logo-name .accent { color: var(--cyan-bright); font-style: italic; }
+.sidebar-logo-sub { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .09em; margin-top: 4px; }
 
 .sidebar-nav { padding: 8px 0; flex: 1; }
 .nav-group { margin-bottom: 2px; }
@@ -125,7 +117,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .topbar-handle { font-size: 12.5px; font-weight: 600; color: var(--text2); }
 
 /* ── PAGE CONTENT ── */
-.page-content { padding: 24px; flex: 1; max-width: 860px; }
+.page-content { padding: 24px; flex: 1; }
+
+/* ── CHART CONTAINERS ── */
+.chart-wrap { position: relative; height: 220px; margin-top: 12px; }
+.chart-wrap-sm { position: relative; height: 180px; margin-top: 12px; }
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+@media (max-width: 700px) { .charts-row { grid-template-columns: 1fr; } }
 
 /* ── MOBILE HAMBURGER ── */
 .mob-menu-btn {
@@ -479,9 +477,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-brandmark"><span>Fx</span></div>
       <div class="sidebar-logo-text">
-        <div class="sidebar-logo-name">InstaFex</div>
+        <div class="sidebar-logo-name">Insta<span class="accent">Fex</span></div>
         <div class="sidebar-logo-sub">OnFeX Technology®</div>
       </div>
     </div>
@@ -830,8 +827,8 @@ function renderEtapa1Result(p, pos, content) {
         ${posts.slice(0, 9).map(post => `
           <div class="post-thumb-card">
             ${post.thumbnailUrl
-              ? `<img src="${post.thumbnailUrl}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'post-no-thumb',textContent:'${post.type}'}));">`
-              : `<div class="post-no-thumb">${post.type}</div>`}
+              ? `<img src="/api/proxy-pic?url=${encodeURIComponent(post.thumbnailUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+              : `<div class="post-no-thumb">${post.type || 'Post'}</div>`}
             <div class="post-thumb-badge">${(post.type||'').includes('Video')||(post.type||'').includes('Reel') ? '▶' : '◻'} ${post.type}</div>
             <div class="post-thumb-overlay">
               ${post.caption ? `<div style="font-size:9px;color:rgba(255,255,255,.7);margin-bottom:3px;line-height:1.3;overflow:hidden;max-height:26px;">${post.caption.slice(0,50)}${post.caption.length>50?'…':''}</div>` : ''}
@@ -991,34 +988,41 @@ async function loadEtapa2Insights() {
 
 function renderEtapa2Result(d, content) {
   const series = d.accountSeries || {};
-  const reachTotal = (series.reach || []).reduce((a, v) => a + (v.value || 0), 0);
-  const interactionsTotal = (series.total_interactions || []).reduce((a, v) => a + (v.value || 0), 0);
+  const reachSeries = series.reach || [];
+  const intSeries = series.total_interactions || [];
+  const reachTotal = reachSeries.reduce((a, v) => a + (v.value || 0), 0);
+  const interactionsTotal = intSeries.reduce((a, v) => a + (v.value || 0), 0);
   const posts = d.posts || [];
   const avgLikes = posts.length ? Math.round(posts.reduce((a,p) => a+(p.likeCount||0),0)/posts.length) : 0;
   const avgComments = posts.length ? Math.round(posts.reduce((a,p) => a+(p.commentsCount||0),0)/posts.length) : 0;
   const avgSaved = posts.length ? Math.round(posts.reduce((a,p) => a+(p.saved||0),0)/posts.length) : 0;
   const engRate = d.followersCount > 0 && posts.length ? ((avgLikes + avgComments) / d.followersCount * 100).toFixed(2) : null;
+  const typeCount = posts.reduce((acc,p) => { acc[p.mediaType]=(acc[p.mediaType]||0)+1; return acc; }, {});
+  const topPosts = [...posts].sort((a,b) => (b.impressions||b.reach||0)-(a.impressions||a.reach||0)).slice(0,8);
 
-  const topPosts = [...posts].sort((a,b) => (b.impressions||b.reach||0)-(a.impressions||a.reach||0)).slice(0,5);
   const topPostsHtml = topPosts.length ? `
     <div class="card">
-      <div class="card-title">Top ${topPosts.length} publicações por alcance</div>
+      <div class="card-title">Top publicações por alcance</div>
       ${topPosts.map((p,i) => `
         <div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
           <div style="width:22px;height:22px;border-radius:50%;background:var(--bg4);color:var(--cyan-bright);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:12px;color:var(--text3);margin-bottom:3px;">${p.mediaType} · ${p.timestamp ? new Date(p.timestamp).toLocaleDateString('pt-BR') : ''}</div>
-            <div style="font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:5px;">${(p.caption||'Sem legenda').slice(0,90)}${(p.caption||'').length>90?'…':''}</div>
+            <div style="font-size:11.5px;color:var(--text3);margin-bottom:3px;">${p.mediaType}${p.timestamp?' · '+new Date(p.timestamp).toLocaleDateString('pt-BR'):''}</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:5px;">${(p.caption||'Sem legenda').slice(0,100)}${(p.caption||'').length>100?'…':''}</div>
             <div style="font-size:11.5px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;">
               <span>♥ ${fmt(p.likeCount)}</span><span>💬 ${fmt(p.commentsCount)}</span>
               ${p.impressions!=null?`<span>👁 ${fmt(p.impressions)}</span>`:''}
               ${p.saved!=null?`<span>🔖 ${fmt(p.saved)}</span>`:''}
+              ${p.reach!=null&&p.impressions==null?`<span>👁 ${fmt(p.reach)}</span>`:''}
             </div>
           </div>
         </div>`).join('')}
     </div>` : '';
 
   const warnings = [d.account_metrics_warning, d.media_warning].filter(Boolean);
+  const hasTimeline = reachSeries.length > 1;
+  const hasTypes = Object.keys(typeCount).length > 0;
+  const hasBars = topPosts.length > 0;
 
   content.innerHTML = `
     <div class="card" style="border-color:var(--border2);">
@@ -1026,20 +1030,39 @@ function renderEtapa2Result(d, content) {
       <div style="margin-bottom:14px;"><span class="source-tag">✦ Login oficial do Instagram</span></div>
       <div class="insights-mets">
         <div class="ins-met"><div class="v">${d.followersCount!=null ? fmt(d.followersCount) : '—'}</div><div class="l">Seguidores</div></div>
-        <div class="ins-met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
+        <div class="ins-met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance total</div></div>
         <div class="ins-met"><div class="v">${fmt(interactionsTotal)}</div><div class="l">Interações</div></div>
         <div class="ins-met"><div class="v">${engRate ? engRate+'%' : '—'}</div><div class="l">Engajamento</div></div>
       </div>
       ${posts.length > 0 ? `
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
         <div class="ins-met"><div class="v">${fmt(avgLikes)}</div><div class="l">Curtidas/post</div></div>
         <div class="ins-met"><div class="v">${fmt(avgComments)}</div><div class="l">Comentários/post</div></div>
         <div class="ins-met"><div class="v">${avgSaved > 0 ? fmt(avgSaved) : '—'}</div><div class="l">Salvamentos/post</div></div>
       </div>` : ''}
-      ${warnings.length ? `<div style="margin-top:12px;font-size:11px;color:var(--text3);">⚠ ${warnings.join(' · ')}</div>` : ''}
+      ${warnings.length ? `<div style="margin-top:10px;font-size:11px;color:var(--text3);">⚠ ${warnings.join(' · ')}</div>` : ''}
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <button class="btn-s" onclick="disconnectInstagram()" style="width:auto;padding:7px 14px;font-size:12.5px;">Desconectar conta</button>
       </div>
+    </div>
+
+    ${hasTimeline ? `
+    <div class="card">
+      <div class="card-title">Alcance & Interações — Evolução diária</div>
+      <div class="chart-wrap"><canvas id="chart-timeline"></canvas></div>
+    </div>` : ''}
+
+    <div class="charts-row">
+      ${hasTypes ? `
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">Distribuição de formatos</div>
+        <div class="chart-wrap-sm"><canvas id="chart-types"></canvas></div>
+      </div>` : ''}
+      ${hasBars ? `
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">Curtidas vs Comentários — Top posts</div>
+        <div class="chart-wrap-sm"><canvas id="chart-posts"></canvas></div>
+      </div>` : ''}
     </div>
 
     ${renderInsightsAnalysisHtml(d.analysis, d.analysis_error)}
@@ -1052,6 +1075,77 @@ function renderEtapa2Result(d, content) {
         <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento</button>
       </div>
     </div>`;
+
+  setTimeout(() => initEtapa2Charts(d), 80);
+}
+
+function initEtapa2Charts(d) {
+  const GRID_COLOR = 'rgba(125,211,240,0.06)';
+  const TICK_COLOR = '#5C6378';
+  const chartDefaults = {
+    plugins: { legend: { labels: { color: '#9CA3B8', font: { size: 11, family: 'Inter' }, padding: 14, boxWidth: 10 } } },
+    scales: {
+      x: { ticks: { color: TICK_COLOR, font: { size: 10 } }, grid: { color: GRID_COLOR } },
+      y: { ticks: { color: TICK_COLOR, font: { size: 10 } }, grid: { color: GRID_COLOR }, beginAtZero: true }
+    }
+  };
+
+  const series = d.accountSeries || {};
+  const reachSeries = series.reach || [];
+  const intSeries = series.total_interactions || [];
+  const posts = d.posts || [];
+
+  // Timeline
+  const ctx1 = document.getElementById('chart-timeline')?.getContext('2d');
+  if (ctx1 && reachSeries.length > 1) {
+    const labels = reachSeries.map(v => new Date(v.date).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit'}));
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Alcance', data: reachSeries.map(v => v.value||0), borderColor: '#6FCBEC', backgroundColor: 'rgba(111,203,236,0.12)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 },
+          { label: 'Interações', data: intSeries.map(v => v.value||0), borderColor: '#4ADE9C', backgroundColor: 'rgba(74,222,156,0.10)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, ...chartDefaults }
+    });
+  }
+
+  // Donut — formats
+  const typeCount = posts.reduce((acc,p) => { acc[p.mediaType]=(acc[p.mediaType]||0)+1; return acc; }, {});
+  const ctx2 = document.getElementById('chart-types')?.getContext('2d');
+  if (ctx2 && Object.keys(typeCount).length > 0) {
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(typeCount),
+        datasets: [{ data: Object.values(typeCount), backgroundColor: ['#6FCBEC','#4ADE9C','#F0B25C','#F0625C','#A78BFA'], borderWidth: 0, hoverOffset: 6 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#9CA3B8', font: { size: 11 }, padding: 10, boxWidth: 10 } } }
+      }
+    });
+  }
+
+  // Bar — likes vs comments per post
+  const topPosts = [...posts].sort((a,b) => (b.likeCount||0)-(a.likeCount||0)).slice(0,8);
+  const ctx3 = document.getElementById('chart-posts')?.getContext('2d');
+  if (ctx3 && topPosts.length > 0) {
+    new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: topPosts.map((_,i) => `P${i+1}`),
+        datasets: [
+          { label: 'Curtidas', data: topPosts.map(p => p.likeCount||0), backgroundColor: 'rgba(111,203,236,0.72)', borderRadius: 4 },
+          { label: 'Comentários', data: topPosts.map(p => p.commentsCount||0), backgroundColor: 'rgba(74,222,156,0.72)', borderRadius: 4 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, ...chartDefaults }
+    });
+  }
 }
 
 function renderInsightsAnalysisHtml(analysis, analysisError) {
