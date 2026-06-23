@@ -22,15 +22,10 @@ export default async function handler(req, res) {
   const { accessToken, igUserId, igUsername } = session;
 
   try {
-    // Métricas de conta: reach e follower_count são as mais estáveis hoje.
-    // Se a Meta mudar nomes de novo, ajuste aqui conforme a doc oficial:
-    // https://developers.facebook.com/docs/instagram-platform/insights/
-    //
-    // As duas chamadas abaixo são independentes — rodam em paralelo (Promise.all)
-    // pra resposta sair em metade do tempo.
-    const [accountMetrics, mediaRes] = await Promise.all([
-      safeFetch(`${GRAPH_IG}/${igUserId}/insights?metric=reach,follower_count&period=day&metric_type=time_series&access_token=${accessToken}`),
-      safeFetch(`${GRAPH_IG}/${igUserId}/media?fields=id,caption,media_type,timestamp,permalink,like_count,comments_count,insights.metric(impressions,reach,saved)&limit=12&access_token=${accessToken}`)
+    const [accountMetrics, mediaRes, meRes] = await Promise.all([
+      safeFetch(`${GRAPH_IG}/${igUserId}/insights?metric=reach,impressions&period=day&metric_type=time_series&access_token=${accessToken}`),
+      safeFetch(`${GRAPH_IG}/${igUserId}/media?fields=id,caption,media_type,timestamp,permalink,like_count,comments_count,thumbnail_url,media_url,insights.metric(impressions,reach,saved)&limit=12&access_token=${accessToken}`),
+      safeFetch(`${GRAPH_IG}/${igUserId}?fields=followers_count,media_count&access_token=${accessToken}`)
     ]);
 
     const posts = (mediaRes?.data || []).map(m => {
@@ -44,8 +39,10 @@ export default async function handler(req, res) {
         mediaType: m.media_type,
         timestamp: m.timestamp,
         permalink: m.permalink,
+        thumbnailUrl: m.thumbnail_url || m.media_url || null,
         likeCount: m.like_count || 0,
         commentsCount: m.comments_count || 0,
+        impressions: ins.impressions ?? null,
         reach: ins.reach ?? null,
         saved: ins.saved ?? null
       };
@@ -56,9 +53,14 @@ export default async function handler(req, res) {
       return acc;
     }, {});
 
+    const followersCount = meRes?.followers_count ?? null;
+    const mediaCount = meRes?.media_count ?? null;
+
     return res.status(200).json({
       igUsername,
       igUserId,
+      followersCount,
+      mediaCount,
       accountSeries,
       posts,
       account_metrics_warning: accountMetrics?.error ? accountMetrics.error.message : null,

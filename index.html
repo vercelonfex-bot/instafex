@@ -841,17 +841,19 @@ function renderEtapa2(d) {
 
   const series = d.accountSeries || {};
   const reachSeries = series.reach || [];
-  const followerSeries = series.follower_count || [];
+  const impressionsSeries = series.impressions || [];
   const reachTotal = reachSeries.reduce((a, v) => a + (v.value || 0), 0);
-  const lastFollower = followerSeries.length ? followerSeries[followerSeries.length - 1].value : null;
+  const impressionsTotal = impressionsSeries.reduce((a, v) => a + (v.value || 0), 0);
 
   const postsHtml = (d.posts || []).length > 0 ? `
     <div class="posts-grid" style="margin-top:14px;">
       ${d.posts.slice(0, 9).map(p => `
         <div class="post-card">
-          <div class="pc-type">${p.mediaType}</div>
+          ${p.thumbnailUrl
+            ? `<img src="${p.thumbnailUrl}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block;" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="pc-type">${p.mediaType}</div>`}
           <div class="pc-cap">${p.caption || '<sem legenda>'}</div>
-          <div class="pc-mets">♥ ${fmt(p.likeCount)} · 💬 ${fmt(p.commentsCount)}${p.reach != null ? ' · 👁 ' + fmt(p.reach) : ''}${p.saved != null ? ' · 🔖 ' + fmt(p.saved) : ''}</div>
+          <div class="pc-mets">♥ ${fmt(p.likeCount)} · 💬 ${fmt(p.commentsCount)}${p.impressions != null ? ' · 👁 ' + fmt(p.impressions) : p.reach != null ? ' · 👁 ' + fmt(p.reach) : ''}${p.saved != null ? ' · 🔖 ' + fmt(p.saved) : ''}</div>
         </div>`).join('')}
     </div>` : '<div style="font-size:13px;color:var(--text2);margin-top:10px;">Nenhum post recente com Insights disponível ainda.</div>';
 
@@ -865,8 +867,8 @@ function renderEtapa2(d) {
       </div>
       <div class="mets">
         <div class="met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
-        <div class="met"><div class="v">${lastFollower != null ? fmt(lastFollower) : '—'}</div><div class="l">Seguidores (interno)</div></div>
-        <div class="met"><div class="v">${d.posts ? d.posts.length : 0}</div><div class="l">Posts analisados</div></div>
+        <div class="met"><div class="v">${d.followersCount != null ? fmt(d.followersCount) : '—'}</div><div class="l">Seguidores (total)</div></div>
+        <div class="met"><div class="v">${impressionsTotal > 0 ? fmt(impressionsTotal) : (d.posts ? d.posts.length : 0)}</div><div class="l">${impressionsTotal > 0 ? 'Impressões (período)' : 'Posts analisados'}</div></div>
       </div>
       <div class="card-title" style="margin-top:18px;">Performance por publicação</div>
       ${postsHtml}
