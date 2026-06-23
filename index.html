@@ -3,93 +3,143 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-<title>Analisador de Perfil (InstaFex) — OnFeX</title>
+<title>InstaFex — OnFeX Technology</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* OnFeX palette — derived from brand mark */
-  --bg: #060810;
-  --bg-deep: #03040a;
-  --bg2: #0d0f1a;
-  --bg3: #131726;
-  --bg4: #1a1f33;
-  --border: rgba(125,211,240,0.10);
-  --border2: rgba(125,211,240,0.22);
-  --text: #F5F5F0;
-  --text2: #9CA3B8;
-  --text3: #5C6378;
-  --cyan: #6FCBEC;
-  --cyan-bright: #9FE0F7;
-  --cyan-dim: rgba(111,203,236,0.12);
-  --good: #4ADE9C;
-  --warn: #F0B25C;
-  --bad: #F0625C;
-  --r: 16px; --rsm: 10px;
-  --serif: 'Fraunces', serif;
-  --sans: 'Inter', -apple-system, sans-serif;
+  --bg: #060810; --bg-deep: #03040a; --bg2: #0d0f1a; --bg3: #131726; --bg4: #1a1f33;
+  --border: rgba(125,211,240,0.10); --border2: rgba(125,211,240,0.22);
+  --text: #F5F5F0; --text2: #9CA3B8; --text3: #5C6378;
+  --cyan: #6FCBEC; --cyan-bright: #9FE0F7; --cyan-dim: rgba(111,203,236,0.12);
+  --good: #4ADE9C; --warn: #F0B25C; --bad: #F0625C;
+  --r: 14px; --rsm: 10px;
+  --serif: 'Fraunces', serif; --sans: 'Inter', -apple-system, sans-serif;
+  --sidebar-w: 232px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-  background:
-    radial-gradient(circle at 15% 0%, rgba(111,203,236,0.06), transparent 45%),
-    radial-gradient(circle at 90% 30%, rgba(111,203,236,0.04), transparent 50%),
-    var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
-.app { max-width: 800px; margin: 0 auto; padding: 0 18px 90px; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; min-height: 100vh; }
 
-/* ── GRID WATERMARK (echoes the logo's wireframe) ── */
+/* ── GRID WATERMARK ── */
 .grid-watermark {
-  position: fixed; inset: 0; z-index: -1; opacity: 0.4; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(111,203,236,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(111,203,236,0.025) 1px, transparent 1px);
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(111,203,236,0.022) 1px,transparent 1px), linear-gradient(90deg,rgba(111,203,236,0.022) 1px,transparent 1px);
   background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse 70% 50% at 50% 0%,black 0%,transparent 70%);
 }
 
-/* ── HEADER ── */
-.header { padding: 44px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
-.brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.brand-mark {
-  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
-  background: var(--bg-deep);
-  border: 1px solid var(--border2);
+/* ── APP SHELL ── */
+.app-shell { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.sidebar-brandmark {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+  background: var(--bg-deep); border: 1px solid var(--border2);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
 }
-.brand-mark::before {
+.sidebar-brandmark::before {
   content: ''; position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(111,203,236,0.5) 0.5px, transparent 0.5px),
-    linear-gradient(90deg, rgba(111,203,236,0.5) 0.5px, transparent 0.5px);
-  background-size: 6px 6px;
-  transform: skewY(-6deg) scale(1.3);
-  opacity: 0.55;
+  background-image: linear-gradient(rgba(111,203,236,0.5) 0.5px,transparent 0.5px), linear-gradient(90deg,rgba(111,203,236,0.5) 0.5px,transparent 0.5px);
+  background-size: 5px 5px; transform: skewY(-6deg) scale(1.3); opacity: 0.5;
 }
-.brand-mark span { position: relative; font-family: var(--serif); font-weight: 600; font-size: 17px; color: var(--text); z-index: 1; }
-.brand-text h1 { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
-.brand-text h1 .accent { color: var(--cyan-bright); font-style: italic; }
-.brand-text .powered { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px; }
-.header-sub { margin-left: 60px; }
-.header-sub .title { font-size: 14px; color: var(--text); font-weight: 500; margin-bottom: 3px; }
-.header-sub .desc { font-size: 12.5px; color: var(--text3); line-height: 1.5; max-width: 480px; }
+.sidebar-brandmark span { position: relative; font-family: var(--serif); font-weight: 700; font-size: 13px; color: var(--text); z-index: 1; }
+.sidebar-logo-text { flex: 1; min-width: 0; }
+.sidebar-logo-name { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.1; }
+.sidebar-logo-sub { font-size: 9.5px; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-top: 1px; }
+
+.sidebar-nav { padding: 8px 0; flex: 1; }
+.nav-group { margin-bottom: 2px; }
+.nav-group-label {
+  padding: 10px 16px 3px; font-size: 9.5px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase; letter-spacing: .09em;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; margin: 1px 6px; border-radius: 8px;
+  font-size: 13px; color: var(--text2); font-weight: 500;
+  cursor: pointer; transition: background .14s, color .14s;
+  border: none; background: none; width: calc(100% - 12px);
+  text-align: left; font-family: var(--sans); line-height: 1.2;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--cyan-dim); color: var(--cyan-bright); font-weight: 600; }
+.nav-item.done { color: var(--text); }
+.nav-item.done .ni-badge { display: inline-flex; }
+.nav-icon { font-size: 15px; flex-shrink: 0; width: 22px; text-align: center; line-height: 1; }
+.ni-label { flex: 1; }
+.ni-badge {
+  display: none; font-size: 8.5px; font-weight: 700;
+  background: var(--good); color: var(--bg-deep);
+  border-radius: 4px; padding: 1px 5px; flex-shrink: 0;
+}
+
+.sidebar-footer {
+  padding: 10px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.sidebar-footer-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg3);
+  color: var(--text2); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; font-family: var(--sans); transition: all .14s;
+  margin-bottom: 5px;
+}
+.sidebar-footer-btn:hover { border-color: var(--border2); color: var(--text); }
+.sidebar-footer-btn:last-child { margin-bottom: 0; }
+
+/* ── MAIN WRAP ── */
+.main-wrap { margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; flex: 1; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 58px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 14px;
+  position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+}
+.topbar-info { flex: 1; min-width: 0; }
+.topbar-title { font-size: 14.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-sub { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-profile { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.topbar-avatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg4); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--cyan-bright);
+  position: relative; overflow: hidden;
+}
+.topbar-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.topbar-handle { font-size: 12.5px; font-weight: 600; color: var(--text2); }
+
+/* ── PAGE CONTENT ── */
+.page-content { padding: 24px; flex: 1; max-width: 860px; }
+
+/* ── MOBILE HAMBURGER ── */
+.mob-menu-btn {
+  display: none; background: none; border: none; color: var(--text2);
+  font-size: 20px; cursor: pointer; padding: 4px; flex-shrink: 0;
+}
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 190; }
+.sidebar-overlay.open { display: block; }
 
 /* ── CARDS ── */
-.card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
-}
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 22px; margin-bottom: 14px; }
 .card-title {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--cyan); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
 }
 .card-title::before { content: ''; width: 3px; height: 11px; background: var(--cyan); border-radius: 2px; display: inline-block; }
 
@@ -99,631 +149,436 @@ body {
 .field label { font-size: 12px; color: var(--text2); font-weight: 500; }
 .field input {
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--rsm); color: var(--text);
-  font-size: 15px; font-family: inherit;
-  padding: 13px 15px; outline: none; transition: all 0.18s;
+  border-radius: var(--rsm); color: var(--text); font-size: 15px; font-family: inherit;
+  padding: 12px 14px; outline: none; transition: all .18s;
 }
 .field input:focus { border-color: var(--cyan); background: var(--bg4); box-shadow: 0 0 0 3px var(--cyan-dim); }
 .field input::placeholder { color: var(--text3); }
 
+/* ── BUTTONS ── */
 .btn-main {
-  width: 100%; padding: 16px;
-  background: var(--text);
+  width: 100%; padding: 15px; background: var(--text);
   color: var(--bg-deep); border: none; border-radius: var(--r);
-  font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: -0.1px;
-  transition: all 0.2s; margin-top: 6px;
-  font-family: var(--sans);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: all .2s; margin-top: 6px; font-family: var(--sans);
 }
 .btn-main:hover { background: var(--cyan-bright); transform: translateY(-1px); }
 .btn-main:active { transform: translateY(0); }
-.btn-main:disabled { opacity: 0.35; cursor: not-allowed; }
-
-.err {
-  background: rgba(240,98,92,0.08); border: 1px solid rgba(240,98,92,0.2);
-  border-radius: var(--rsm); padding: 13px 16px;
-  font-size: 13px; color: var(--bad); margin-top: 12px; display: none;
-}
-
-/* ── LOADING (premium) ── */
-#loading { display: none; text-align: center; padding: 90px 20px 60px; }
-.loader-orb {
-  width: 88px; height: 88px; margin: 0 auto 32px; position: relative;
-}
-.loader-orb svg { width: 100%; height: 100%; }
-.loader-ring {
-  fill: none; stroke: var(--cyan); stroke-width: 1.4; opacity: 0.85;
-  stroke-dasharray: 4 230; stroke-linecap: round;
-  transform-origin: 50% 50%;
-  animation: orbit 2.2s linear infinite;
-}
-.loader-ring2 {
-  fill: none; stroke: var(--cyan-bright); stroke-width: 1; opacity: 0.4;
-  stroke-dasharray: 2 300;
-  transform-origin: 50% 50%;
-  animation: orbit 3.4s linear infinite reverse;
-}
-@keyframes orbit { to { transform: rotate(360deg); } }
-.loader-core {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 8px; height: 8px; border-radius: 50%; background: var(--cyan-bright);
-  box-shadow: 0 0 18px 4px var(--cyan-dim);
-  animation: pulse 1.6s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100%{ opacity: 0.6; transform: translate(-50%,-50%) scale(1); } 50%{ opacity: 1; transform: translate(-50%,-50%) scale(1.4); } }
-#loading .lmsg { font-family: var(--serif); font-size: 17px; font-weight: 500; color: var(--text); margin-bottom: 8px; min-height: 26px; transition: opacity 0.3s; }
-#loading .lsub { font-size: 12px; color: var(--text3); letter-spacing: 0.04em; text-transform: uppercase; }
-.loader-bar-bg { width: 240px; height: 3px; background: var(--bg4); border-radius: 2px; margin: 22px auto 0; overflow: hidden; }
-.loader-bar-fill { height: 100%; width: 0%; background: var(--cyan); border-radius: 2px; transition: width 0.4s ease-out; }
-.loader-pct { font-family: var(--serif); font-size: 13px; color: var(--cyan-bright); margin-top: 10px; font-weight: 500; letter-spacing: 0.02em; }
-@keyframes sweep { 0%{ margin-left: -30%; } 100%{ margin-left: 100%; } }
-
-/* ── RESULT ── */
-#result { display: none; }
-
-.profile-hero {
-  display: flex; align-items: center; gap: 20px;
-  background: linear-gradient(135deg, var(--bg2), var(--bg3));
-  border: 1px solid var(--border); border-radius: var(--r);
-  padding: 28px; margin-bottom: 14px; position: relative; overflow: hidden;
-}
-.profile-hero::after {
-  content: ''; position: absolute; top: -50%; right: -20%; width: 280px; height: 280px;
-  background: radial-gradient(circle, rgba(111,203,236,0.08), transparent 70%);
-  pointer-events: none;
-}
-.avatar {
-  width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
-  background: var(--bg-deep); border: 1px solid var(--border2);
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-  font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--cyan-bright);
-  position: relative; z-index: 1;
-}
-.pinfo { flex: 1; position: relative; z-index: 1; }
-.pinfo .handle { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: -0.3px; }
-.pinfo .sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
-.pinfo .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-.badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
-.ba { background: rgba(74,222,156,0.12); color: var(--good); }
-.bb { background: rgba(240,178,92,0.12); color: var(--warn); }
-.bn { background: var(--cyan-dim); color: var(--cyan-bright); }
-.score-area { text-align: right; flex-shrink: 0; position: relative; z-index: 1; }
-.score-big { font-family: var(--serif); font-size: 50px; font-weight: 600; letter-spacing: -2px; line-height: 1; }
-.score-sub { font-size: 10.5px; color: var(--text3); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
-
-.mets { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
-.met { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; text-align: center; }
-.met .v { font-family: var(--serif); font-size: 25px; font-weight: 600; }
-.met .l { font-size: 10.5px; color: var(--text3); margin-top: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
-
-.score-rows { display: flex; flex-direction: column; gap: 14px; }
-.srow { display: flex; flex-direction: column; gap: 5px; }
-.srow-h { display: flex; justify-content: space-between; font-size: 13px; }
-.srow-n { color: var(--text2); }
-.srow-v { font-weight: 600; font-family: var(--serif); }
-.bar-bg { background: var(--bg4); border-radius: 3px; height: 5px; overflow: hidden; }
-.bar-f { height: 5px; border-radius: 3px; transition: width 1.2s cubic-bezier(.16,1,.3,1); width: 0; background: var(--cyan); }
-
-/* faturamento */
-.fat-box {
-  background: linear-gradient(135deg, rgba(74,222,156,0.06), rgba(111,203,236,0.06));
-  border: 1px solid rgba(74,222,156,0.18);
-  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
-}
-.fat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--good); margin-bottom: 10px; }
-.fat-range { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
-.fat-range .sep { color: var(--text3); font-size: 22px; margin: 0 8px; }
-.fat-just { font-size: 13px; color: var(--text2); line-height: 1.6; }
-
-.sw { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.sw-b { background: var(--bg3); border-radius: var(--rsm); padding: 16px; }
-.sw-t { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 11px; }
-.sw-t.g { color: var(--good); }
-.sw-t.r { color: var(--bad); }
-.sw-i { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 9px; font-size: 13px; color: var(--text2); line-height: 1.5; }
-.dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
-.dot.g { background: var(--good); }
-.dot.r { background: var(--bad); }
-
-.plan-i { display: flex; gap: 14px; padding: 17px 0; border-bottom: 1px solid var(--border); }
-.plan-i:last-child { border-bottom: none; }
-.plan-n {
-  width: 27px; height: 27px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; background: var(--bg4); color: var(--cyan-bright);
-  border: 1px solid var(--border2);
-}
-.plan-c { flex: 1; }
-.plan-h { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; flex-wrap: wrap; }
-.plan-title { font-size: 14px; font-weight: 600; }
-.pprio { padding: 2px 8px; border-radius: 7px; font-size: 10.5px; font-weight: 600; }
-.ph { background: rgba(240,98,92,0.1); color: var(--bad); }
-.pm { background: rgba(240,178,92,0.1); color: var(--warn); }
-.pl { background: rgba(74,222,156,0.1); color: var(--good); }
-.plan-prazo { font-size: 11px; color: var(--text3); margin-left: auto; }
-.plan-d { font-size: 13px; color: var(--text2); line-height: 1.6; }
-
-.bio-box {
-  background: var(--bg3); border-left: 2px solid var(--cyan);
-  border-radius: 0 var(--rsm) var(--rsm) 0; padding: 18px;
-  font-size: 14.5px; color: var(--text); line-height: 1.7; font-family: var(--serif); font-style: italic;
-}
-
-.summary {
-  background: linear-gradient(135deg, var(--cyan-dim), rgba(111,203,236,0.02));
-  border: 1px solid var(--border2);
-  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
-}
-.summary .st { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--cyan-bright); margin-bottom: 11px; }
-.summary .sc { font-size: 14px; color: var(--text2); line-height: 1.8; }
-
-/* CALENDAR 30 dias */
-.cal-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
-.cal-tab {
-  flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
-  background: var(--bg3); border: 1px solid var(--border); color: var(--text2); cursor: pointer;
-  transition: all 0.15s; white-space: nowrap;
-}
-.cal-tab.active { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan-bright); }
-.cal-day { display: none; }
-.cal-day.active { display: block; animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from{opacity:0; transform: translateY(4px);} to{opacity:1; transform: translateY(0);} }
-.cal-feed { background: var(--bg3); border-radius: var(--rsm); padding: 16px; margin-bottom: 12px; }
-.cal-feed-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cyan); margin-bottom: 8px; }
-.formato-tag { display: inline-block; background: var(--bg4); border-radius: 6px; padding: 3px 9px; font-size: 11.5px; color: var(--text2); margin-bottom: 6px; border: 1px solid var(--border); }
-.cal-pauta { font-weight: 600; color: var(--text); margin-bottom: 4px; font-size: 14px; }
-.cal-hook { font-size: 12.5px; color: var(--text3); font-style: italic; }
-.cal-stories { display: flex; flex-direction: column; gap: 8px; }
-.cal-stories-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px; }
-.story-pill { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text2); }
-.story-num { width: 16px; height: 16px; border-radius: 50%; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--cyan-bright); flex-shrink: 0; margin-top: 1px; }
-.cal-nav { display: flex; justify-content: space-between; margin-top: 14px; }
-.cal-nav button {
-  background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
-  padding: 8px 16px; border-radius: var(--rsm); font-size: 13px; cursor: pointer; font-family: inherit;
-}
-.cal-nav button:hover { border-color: var(--border2); color: var(--text); }
-.cal-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
-
-/* VIRAL REFS */
-.viral-grid { display: flex; flex-direction: column; gap: 11px; }
-.viral-card { background: var(--bg3); border-radius: var(--rsm); padding: 16px; border-left: 2px solid var(--cyan); position: relative; }
-.viral-rank { position: absolute; top: 14px; right: 16px; font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--border2); }
-.viral-handle { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.viral-handle a { color: var(--text); text-decoration: none; }
-.viral-handle a:hover { color: var(--cyan-bright); }
-.viral-tipo { font-size: 12.5px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
-.viral-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-.viral-item-title { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 3px; }
-.viral-item-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-.actions { display: flex; gap: 10px; margin-top: 22px; }
+.btn-main:disabled { opacity: .35; cursor: not-allowed; }
 .btn-s {
-  flex: 1; padding: 13px; border-radius: var(--rsm);
+  flex: 1; padding: 11px 16px; border-radius: var(--rsm);
   border: 1px solid var(--border); background: var(--bg2);
-  color: var(--text2); font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s; font-family: var(--sans);
+  color: var(--text2); font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: all .15s; font-family: var(--sans);
 }
 .btn-s:hover { border-color: var(--border2); color: var(--text); }
 .btn-s.p { background: var(--text); border-color: var(--text); color: var(--bg-deep); }
 .btn-s.p:hover { background: var(--cyan-bright); border-color: var(--cyan-bright); }
 
-.source-tag {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: rgba(74,222,156,0.08); border: 1px solid rgba(74,222,156,0.18);
-  color: var(--good); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+/* ── ERROR ── */
+.err {
+  background: rgba(240,98,92,.08); border: 1px solid rgba(240,98,92,.2);
+  border-radius: var(--rsm); padding: 12px 16px;
+  font-size: 13px; color: var(--bad); margin-top: 12px; display: none;
 }
 
-/* ── STEPPER (5 etapas) ── */
-.stepper { display: flex; gap: 6px; margin-bottom: 22px; overflow-x: auto; padding-bottom: 4px; }
-.step-pill {
-  flex: 1; min-width: 92px; background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--rsm); padding: 10px 12px; text-align: center; position: relative;
-}
-.step-pill .sp-num {
-  width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; background: var(--bg4); color: var(--text3);
-}
-.step-pill .sp-label { font-size: 10px; color: var(--text3); letter-spacing: 0.02em; line-height: 1.3; }
-.step-pill.active { border-color: var(--cyan); background: var(--cyan-dim); }
-.step-pill.active .sp-num { background: var(--cyan); color: var(--bg-deep); }
-.step-pill.active .sp-label { color: var(--cyan-bright); font-weight: 600; }
-.step-pill.done .sp-num { background: var(--good); color: var(--bg-deep); }
-.step-pill.done .sp-label { color: var(--good); }
-.step-pill.locked { opacity: 0.45; }
+/* ── LOADING ── */
+.loading-wrap { text-align: center; padding: 80px 20px 60px; }
+.loader-orb { width: 80px; height: 80px; margin: 0 auto 28px; position: relative; }
+.loader-orb svg { width: 100%; height: 100%; }
+.loader-ring { fill:none; stroke:var(--cyan); stroke-width:1.4; opacity:.85; stroke-dasharray:4 230; stroke-linecap:round; transform-origin:50% 50%; animation:orbit 2.2s linear infinite; }
+.loader-ring2 { fill:none; stroke:var(--cyan-bright); stroke-width:1; opacity:.4; stroke-dasharray:2 300; transform-origin:50% 50%; animation:orbit 3.4s linear infinite reverse; }
+@keyframes orbit { to { transform: rotate(360deg); } }
+.loader-core { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:8px; height:8px; border-radius:50%; background:var(--cyan-bright); box-shadow:0 0 18px 4px var(--cyan-dim); animation:pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{ opacity:.6; transform:translate(-50%,-50%) scale(1); } 50%{ opacity:1; transform:translate(-50%,-50%) scale(1.4); } }
+.lmsg { font-family:var(--serif); font-size:17px; font-weight:500; color:var(--text); margin-bottom:8px; min-height:26px; transition:opacity .3s; }
+.lsub { font-size:12px; color:var(--text3); letter-spacing:.04em; text-transform:uppercase; }
+.loader-bar-bg { width:220px; height:3px; background:var(--bg4); border-radius:2px; margin:20px auto 0; overflow:hidden; }
+.loader-bar-fill { height:100%; width:0%; background:var(--cyan); border-radius:2px; transition:width .4s ease-out; }
+.loader-pct { font-family:var(--serif); font-size:13px; color:var(--cyan-bright); margin-top:10px; font-weight:500; }
 
-/* ── POSTS GRID (Etapa 1) ── */
-.posts-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-.post-card { background: var(--bg3); border-radius: var(--rsm); padding: 10px; border: 1px solid var(--border); }
-.post-card .pc-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cyan); margin-bottom: 5px; }
-.post-card .pc-cap { font-size: 11px; color: var(--text2); line-height: 1.4; margin-bottom: 6px; min-height: 30px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.post-card .pc-mets { font-size: 10.5px; color: var(--text3); }
-.tag-chip { display: inline-block; background: var(--bg4); border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; font-size: 11px; color: var(--text2); margin: 2px 4px 2px 0; }
-.obs-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-.obs-i { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text2); line-height: 1.5; }
-.obs-i .dotc { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; margin-top: 7px; }
-.next-step-box {
-  background: var(--bg3); border: 1px dashed var(--border2); border-radius: var(--r);
-  padding: 20px; text-align: center; margin-top: 4px;
+/* ── INLINE LOADING ── */
+.inline-load { display:flex; align-items:center; gap:12px; padding:20px 0; color:var(--text2); font-size:13px; }
+.inline-spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--cyan); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── PROFILE HERO ── */
+.profile-hero {
+  display:flex; align-items:center; gap:18px;
+  background:linear-gradient(135deg,var(--bg2),var(--bg3));
+  border:1px solid var(--border); border-radius:var(--r);
+  padding:24px; margin-bottom:14px; position:relative; overflow:hidden;
 }
-.next-step-box .ns-t { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
-.btn-locked {
-  width: 100%; padding: 14px; background: var(--bg4); border: 1px solid var(--border);
-  color: var(--text3); border-radius: var(--rsm); font-size: 14px; font-weight: 600;
-  cursor: not-allowed; font-family: var(--sans);
+.profile-hero::after {
+  content:''; position:absolute; top:-50%; right:-20%; width:260px; height:260px;
+  background:radial-gradient(circle,rgba(111,203,236,.07),transparent 70%); pointer-events:none;
 }
+.avatar {
+  width:58px; height:58px; border-radius:50%; flex-shrink:0;
+  background:var(--bg-deep); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  font-family:var(--serif); font-size:22px; font-weight:600; color:var(--cyan-bright); z-index:1;
+}
+.pinfo { flex:1; min-width:0; position:relative; z-index:1; }
+.pinfo .handle { font-family:var(--serif); font-size:20px; font-weight:600; letter-spacing:-.3px; }
+.pinfo .sub { font-size:12.5px; color:var(--text2); margin-top:2px; }
+.pinfo .badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.badge { padding:3px 9px; border-radius:7px; font-size:10.5px; font-weight:600; }
+.ba { background:rgba(74,222,156,.12); color:var(--good); }
+.bb { background:rgba(240,178,92,.12); color:var(--warn); }
+.bn { background:var(--cyan-dim); color:var(--cyan-bright); }
+.source-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(74,222,156,.08); border:1px solid rgba(74,222,156,.18); color:var(--good); border-radius:7px; padding:3px 9px; font-size:10.5px; font-weight:600; }
 
 /* ── SCORE BADGE ── */
 .score-badge {
-  flex-shrink: 0; text-align: center;
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 14px; padding: 14px 18px; min-width: 82px;
+  flex-shrink:0; text-align:center; background:var(--bg3); border:1px solid var(--border2);
+  border-radius:12px; padding:12px 16px; min-width:78px; position:relative; z-index:1;
 }
-.score-grade { font-family: var(--serif); font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
-.score-pts { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.score-grade { font-family:var(--serif); font-size:32px; font-weight:700; line-height:1; margin-bottom:2px; }
+.score-pts { font-size:9.5px; color:var(--text3); margin-top:3px; }
+.score-bar-wrap { margin-top:6px; }
+.score-bar-bg { height:4px; background:var(--bg4); border-radius:4px; overflow:hidden; }
+.score-bar-fill { height:100%; border-radius:4px; transition:width .6s ease; }
+
+/* ── METRICS GRID ── */
+.mets { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.met { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:16px; text-align:center; }
+.met .v { font-family:var(--serif); font-size:24px; font-weight:600; }
+.met .l { font-size:10px; color:var(--text3); margin-top:4px; letter-spacing:.04em; text-transform:uppercase; }
 
 /* ── REVENUE CARD ── */
-.revenue-card {
-  background: linear-gradient(135deg, rgba(74,222,156,0.07), var(--bg2)) !important;
-  border-color: rgba(74,222,156,0.22) !important;
-}
-.revenue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.rev-box { background: var(--bg3); border-radius: 10px; padding: 14px; }
-.rev-v { font-size: 18px; font-weight: 700; color: var(--good); line-height: 1.2; }
-.rev-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.revenue-card { background:linear-gradient(135deg,rgba(74,222,156,.07),var(--bg2)) !important; border-color:rgba(74,222,156,.22) !important; }
+.revenue-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+.rev-box { background:var(--bg3); border-radius:10px; padding:14px; }
+.rev-v { font-size:17px; font-weight:700; color:var(--good); line-height:1.2; }
+.rev-l { font-size:11px; color:var(--text3); margin-top:3px; }
 
-/* ── POSTS GRID WITH THUMBS (Etapa 1) ── */
-.posts-grid-thumb { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
-.post-thumb-card {
-  position: relative; border-radius: 10px; overflow: hidden;
-  background: var(--bg3); aspect-ratio: 1; border: 1px solid var(--border);
-}
+/* ── POSTS GRID THUMBS ── */
+.posts-grid-thumb { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:12px; }
+.post-thumb-card { position:relative; border-radius:9px; overflow:hidden; background:var(--bg3); aspect-ratio:1; border:1px solid var(--border); }
 .post-thumb-card img { width:100%; height:100%; object-fit:cover; display:block; }
-.post-thumb-overlay {
-  position:absolute; bottom:0; left:0; right:0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.80));
-  padding: 20px 7px 7px;
-}
-.post-thumb-mets { font-size: 10.5px; color: #fff; display:flex; gap:7px; }
-.post-thumb-badge {
-  position:absolute; top:6px; left:6px;
-  background: rgba(0,0,0,0.55); border-radius: 4px;
-  padding: 2px 5px; font-size: 9px; color: #fff;
-  font-weight: 600; text-transform: uppercase; letter-spacing:.04em;
-}
-.post-no-thumb {
-  width:100%; height:100%; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; padding:8px;
-  text-align:center; color: var(--text3); font-size: 11px;
-}
+.post-thumb-overlay { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent,rgba(0,0,0,.82)); padding:18px 6px 6px; }
+.post-thumb-mets { font-size:10px; color:#fff; display:flex; gap:6px; }
+.post-thumb-badge { position:absolute; top:5px; left:5px; background:rgba(0,0,0,.55); border-radius:4px; padding:2px 5px; font-size:8.5px; color:#fff; font-weight:600; text-transform:uppercase; }
+.post-no-thumb { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; color:var(--text3); font-size:11px; }
 
-/* ── SCORE BAR ── */
-.score-bar-wrap { margin-top: 10px; }
-.score-bar-bg { height: 5px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
-.score-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+/* ── BIO BOX ── */
+.bio-box { background:var(--bg3); border-left:2px solid var(--cyan); border-radius:0 var(--rsm) var(--rsm) 0; padding:16px; font-size:14px; color:var(--text); line-height:1.7; font-family:var(--serif); font-style:italic; }
+
+/* ── TAGS / HASHTAGS ── */
+.tag-chip { display:inline-block; background:var(--bg4); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--text2); margin:2px 3px 2px 0; }
+
+/* ── OBS LIST ── */
+.obs-list { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+.obs-i { display:flex; gap:8px; align-items:flex-start; font-size:13px; color:var(--text2); line-height:1.5; }
+.obs-i .dotc { width:5px; height:5px; border-radius:50%; background:var(--cyan); flex-shrink:0; margin-top:7px; }
+
+/* ── NEXT STEP BOX ── */
+.next-step-box { background:var(--bg3); border:1px dashed var(--border2); border-radius:var(--r); padding:20px; text-align:center; margin-top:4px; }
+.next-step-box .ns-t { font-size:13px; color:var(--text2); margin-bottom:12px; }
 
 /* ── STAGE JUMP BUTTONS ── */
-.stage-jumps { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.stage-jumps { display:flex; gap:8px; flex-wrap:wrap; }
 .sj-btn {
-  flex:1; min-width:110px; padding:9px 10px; border-radius:10px;
+  flex:1; min-width:100px; padding:9px 10px; border-radius:10px;
   border:1px solid var(--border); background:var(--bg2); color:var(--text2);
   font-size:11.5px; font-weight:500; cursor:pointer; text-align:center;
-  font-family:var(--sans); transition: border-color .15s, color .15s;
+  font-family:var(--sans); transition:border-color .15s, color .15s;
 }
 .sj-btn:hover { border-color:var(--cyan); color:var(--cyan); }
 
-@media (max-width:600px) {
-  .sw,.mets,.viral-row { grid-template-columns: 1fr; }
-  .profile-hero { flex-direction: column; text-align: center; }
-  .score-area { text-align: center; }
-  .actions { flex-direction: column; }
-  .header-sub { margin-left: 0; margin-top: 12px; }
-  .fat-range { font-size: 26px; }
-  .revenue-grid { grid-template-columns: 1fr; }
-  .score-badge { align-self: center; }
-  .posts-grid-thumb { grid-template-columns: repeat(2,1fr); }
+/* ── SECTION INTRO (locked state) ── */
+.section-intro {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  padding:40px 32px; text-align:center;
 }
-@media (max-width: 380px) {
-  .app { padding: 0 12px 70px; }
-  .card { padding: 18px; }
-}
+.section-intro-icon { font-size:40px; margin-bottom:16px; }
+.section-intro-title { font-family:var(--serif); font-size:22px; font-weight:600; margin-bottom:8px; }
+.section-intro-sub { font-size:13.5px; color:var(--text2); line-height:1.65; max-width:420px; margin:0 auto 24px; }
+.section-checklist { text-align:left; max-width:340px; margin:0 auto 24px; display:flex; flex-direction:column; gap:8px; }
+.section-checklist-item { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text2); }
+.sc-dot { width:18px; height:18px; border-radius:50%; background:var(--cyan-dim); color:var(--cyan-bright); font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
-/* ── INLINE LOADING ── */
-.inline-load { display: flex; align-items: center; gap: 12px; padding: 24px 0; color: var(--text2); font-size: 13px; }
-.inline-spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ── AI ANALYSIS CARDS ── */
+.ai-section { background:var(--bg3); border-radius:12px; padding:16px; margin-bottom:10px; }
+.ai-section-title { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--cyan); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.ai-badge { padding:2px 9px; border-radius:20px; background:var(--bg4); font-size:11px; font-weight:700; }
+.ai-resumo { font-size:13.5px; color:var(--text2); line-height:1.65; margin-bottom:10px; }
+.ai-bullets { display:flex; flex-direction:column; gap:5px; padding-left:0; list-style:none; }
+.ai-bullet { display:flex; gap:8px; align-items:flex-start; font-size:13px; color:var(--text2); line-height:1.5; }
+.ai-bullet::before { content:'›'; color:var(--cyan); font-weight:700; flex-shrink:0; }
+.opp-card { background:var(--bg4); border-left:3px solid var(--cyan); border-radius:10px; padding:12px 14px; margin-bottom:8px; }
+.opp-card:last-child { margin-bottom:0; }
+.opp-card-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.opp-card-desc { font-size:12.5px; color:var(--text2); line-height:1.55; }
 
-/* ── COMPETITION CARDS ── */
-.comp-grid { display: flex; flex-direction: column; gap: 10px; }
-.comp-card { background: var(--bg3); border-radius: var(--rsm); border: 1px solid var(--border); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
-.comp-rank { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--border2); flex-shrink: 0; width: 32px; text-align: center; line-height: 1; padding-top: 4px; }
-.comp-body { flex: 1; }
-.comp-handle { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.comp-handle a { color: inherit; text-decoration: none; }
-.comp-handle a:hover { color: var(--cyan-bright); }
-.comp-size { font-size: 12px; color: var(--text3); margin-bottom: 5px; }
-.comp-tipo { font-size: 12.5px; color: var(--text2); margin-bottom: 8px; line-height: 1.5; }
-.comp-dif { font-size: 12px; color: var(--cyan-bright); font-style: italic; margin-top: 6px; }
-.comp-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
-.comp-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 6px; background: var(--cyan-dim); color: var(--cyan); font-weight: 600; }
-.comp-tag.bad { background: rgba(240,98,92,0.08); color: var(--bad); }
+/* ── INSIGHTS METRICS ── */
+.insights-mets { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+.ins-met { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; }
+.ins-met .v { font-family:var(--serif); font-size:22px; font-weight:600; color:var(--text); }
+.ins-met .l { font-size:9.5px; color:var(--text3); margin-top:3px; text-transform:uppercase; letter-spacing:.04em; }
 
-.bench-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.bench-item { background: var(--bg3); border-radius: var(--rsm); padding: 14px; }
-.bench-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 5px; }
-.bench-value { font-size: 14px; color: var(--text); font-weight: 500; }
-
-.opp-list { display: flex; flex-direction: column; gap: 8px; }
-.opp-i { display: flex; gap: 10px; align-items: flex-start; background: rgba(74,222,156,0.05); border: 1px solid rgba(74,222,156,0.15); border-radius: var(--rsm); padding: 12px 14px; font-size: 13px; color: var(--text2); }
-.opp-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(74,222,156,0.15); color: var(--good); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+/* ── COMPETITION ── */
+.comp-grid { display:flex; flex-direction:column; gap:10px; }
+.comp-card { background:var(--bg3); border-radius:var(--rsm); border:1px solid var(--border); padding:16px; display:flex; gap:14px; align-items:flex-start; }
+.comp-rank { font-family:var(--serif); font-size:22px; font-weight:600; color:var(--border2); flex-shrink:0; width:30px; text-align:center; line-height:1; padding-top:3px; }
+.comp-body { flex:1; }
+.comp-handle { font-size:14.5px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.comp-handle a { color:inherit; text-decoration:none; }
+.comp-handle a:hover { color:var(--cyan-bright); }
+.comp-size { font-size:12px; color:var(--text3); margin-bottom:5px; }
+.comp-tipo { font-size:12.5px; color:var(--text2); margin-bottom:8px; line-height:1.5; }
+.comp-dif { font-size:12px; color:var(--cyan-bright); font-style:italic; margin-top:6px; }
+.comp-tags { display:flex; gap:5px; flex-wrap:wrap; margin-top:6px; }
+.comp-tag { font-size:10.5px; padding:2px 7px; border-radius:6px; background:var(--cyan-dim); color:var(--cyan); font-weight:600; }
+.comp-tag.bad { background:rgba(240,98,92,.08); color:var(--bad); }
+.bench-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.bench-item { background:var(--bg3); border-radius:var(--rsm); padding:12px; }
+.bench-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:4px; }
+.bench-value { font-size:13.5px; color:var(--text); font-weight:500; }
+.opp-list { display:flex; flex-direction:column; gap:8px; }
+.opp-i { display:flex; gap:10px; align-items:flex-start; background:rgba(74,222,156,.05); border:1px solid rgba(74,222,156,.15); border-radius:var(--rsm); padding:12px 14px; font-size:13px; color:var(--text2); }
+.opp-num { width:20px; height:20px; border-radius:50%; background:rgba(74,222,156,.15); color:var(--good); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
 /* ── QUIZ ── */
-.quiz-q { margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
-.quiz-q:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.quiz-label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
-.quiz-num { display: inline-flex; align-items: center; justify-content: center; background: var(--cyan-dim); color: var(--cyan-bright); border-radius: 50%; width: 22px; height: 22px; font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
-.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
-.quiz-opts.quiz-multi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.quiz-opt { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); padding: 11px 14px; cursor: pointer; transition: border-color 0.15s; font-size: 13.5px; color: var(--text2); }
-.quiz-opt:hover { border-color: var(--border2); color: var(--text); }
-.quiz-opt input[type=radio], .quiz-opt input[type=checkbox] { accent-color: var(--cyan); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
-.quiz-input { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); color: var(--text); font-size: 14px; font-family: inherit; padding: 12px 14px; outline: none; width: 100%; transition: all 0.18s; }
-.quiz-input:focus { border-color: var(--cyan); background: var(--bg4); box-shadow: 0 0 0 3px var(--cyan-dim); }
-.quiz-input::placeholder { color: var(--text3); }
+.quiz-q { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+.quiz-q:last-of-type { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.quiz-label { font-size:14px; font-weight:600; color:var(--text); margin-bottom:11px; }
+.quiz-num { display:inline-flex; align-items:center; justify-content:center; background:var(--cyan-dim); color:var(--cyan-bright); border-radius:50%; width:22px; height:22px; font-size:11px; font-weight:700; margin-right:8px; flex-shrink:0; }
+.quiz-opts { display:flex; flex-direction:column; gap:7px; }
+.quiz-opts.quiz-multi { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.quiz-opt { display:flex; align-items:center; gap:10px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--rsm); padding:10px 14px; cursor:pointer; transition:border-color .15s; font-size:13px; color:var(--text2); }
+.quiz-opt:hover { border-color:var(--border2); color:var(--text); }
+.quiz-opt input { accent-color:var(--cyan); width:14px; height:14px; flex-shrink:0; cursor:pointer; }
+.quiz-input { background:var(--bg3); border:1px solid var(--border); border-radius:var(--rsm); color:var(--text); font-size:14px; font-family:inherit; padding:11px 14px; outline:none; width:100%; transition:all .18s; }
+.quiz-input:focus { border-color:var(--cyan); background:var(--bg4); box-shadow:0 0 0 3px var(--cyan-dim); }
+.quiz-input::placeholder { color:var(--text3); }
 
-/* ── ETAPA 5 HEADER ── */
-.etapa5-header { background: linear-gradient(135deg, var(--cyan-dim), rgba(74,222,156,0.05)); border: 1px solid var(--border2); border-radius: var(--r); padding: 20px 24px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
-.etapa5-badge { background: var(--good); color: var(--bg-deep); border-radius: var(--rsm); padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; flex-shrink: 0; }
-.etapa5-title { font-family: var(--serif); font-size: 18px; font-weight: 600; }
-.etapa5-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+/* ── FINAL REPORT ── */
+.score-area { text-align:right; flex-shrink:0; position:relative; z-index:1; }
+.score-big { font-family:var(--serif); font-size:46px; font-weight:600; letter-spacing:-2px; line-height:1; }
+.score-sub { font-size:10px; color:var(--text3); margin-top:3px; letter-spacing:.06em; text-transform:uppercase; }
+.score-rows { display:flex; flex-direction:column; gap:13px; }
+.srow { display:flex; flex-direction:column; gap:5px; }
+.srow-h { display:flex; justify-content:space-between; font-size:13px; }
+.srow-n { color:var(--text2); }
+.srow-v { font-weight:600; font-family:var(--serif); }
+.bar-bg { background:var(--bg4); border-radius:3px; height:5px; overflow:hidden; }
+.bar-f { height:5px; border-radius:3px; transition:width 1.2s cubic-bezier(.16,1,.3,1); width:0; background:var(--cyan); }
+.fat-box { background:linear-gradient(135deg,rgba(74,222,156,.06),rgba(111,203,236,.06)); border:1px solid rgba(74,222,156,.18); border-radius:var(--r); padding:22px; margin-bottom:14px; }
+.fat-label { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--good); margin-bottom:10px; }
+.fat-range { font-family:var(--serif); font-size:30px; font-weight:600; color:var(--text); margin-bottom:10px; }
+.fat-range .sep { color:var(--text3); font-size:20px; margin:0 8px; }
+.fat-just { font-size:13px; color:var(--text2); line-height:1.6; }
+.sw { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.sw-b { background:var(--bg3); border-radius:var(--rsm); padding:14px; }
+.sw-t { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.sw-t.g { color:var(--good); } .sw-t.r { color:var(--bad); }
+.sw-i { display:flex; gap:8px; align-items:flex-start; margin-bottom:8px; font-size:13px; color:var(--text2); line-height:1.5; }
+.dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:7px; }
+.dot.g { background:var(--good); } .dot.r { background:var(--bad); }
+.plan-i { display:flex; gap:14px; padding:15px 0; border-bottom:1px solid var(--border); }
+.plan-i:last-child { border-bottom:none; }
+.plan-n { width:26px; height:26px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; background:var(--bg4); color:var(--cyan-bright); border:1px solid var(--border2); }
+.plan-c { flex:1; }
+.plan-h { display:flex; align-items:center; gap:7px; margin-bottom:4px; flex-wrap:wrap; }
+.plan-title { font-size:14px; font-weight:600; }
+.pprio { padding:2px 8px; border-radius:7px; font-size:10.5px; font-weight:600; }
+.ph { background:rgba(240,98,92,.1); color:var(--bad); }
+.pm { background:rgba(240,178,92,.1); color:var(--warn); }
+.pl { background:rgba(74,222,156,.1); color:var(--good); }
+.plan-prazo { font-size:11px; color:var(--text3); margin-left:auto; }
+.plan-d { font-size:13px; color:var(--text2); line-height:1.6; }
+.summary { background:linear-gradient(135deg,var(--cyan-dim),rgba(111,203,236,.02)); border:1px solid var(--border2); border-radius:var(--r); padding:22px; margin-bottom:14px; }
+.summary .st { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--cyan-bright); margin-bottom:10px; }
+.summary .sc { font-size:14px; color:var(--text2); line-height:1.8; }
 
-@media (max-width:600px) {
+/* ── CALENDAR ── */
+.cal-tabs { display:flex; gap:5px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+.cal-tab { flex-shrink:0; padding:5px 13px; border-radius:20px; font-size:12px; font-weight:600; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:all .15s; white-space:nowrap; }
+.cal-tab.active { background:var(--cyan-dim); border-color:var(--cyan); color:var(--cyan-bright); }
+.cal-feed { background:var(--bg3); border-radius:var(--rsm); padding:14px; margin-bottom:12px; }
+.cal-feed-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--cyan); margin-bottom:7px; }
+.formato-tag { display:inline-block; background:var(--bg4); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--text2); margin-bottom:5px; border:1px solid var(--border); }
+.cal-pauta { font-weight:600; color:var(--text); margin-bottom:4px; font-size:14px; }
+.cal-hook { font-size:12.5px; color:var(--text3); font-style:italic; }
+.cal-stories { display:flex; flex-direction:column; gap:7px; }
+.cal-stories-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:3px; }
+.story-pill { display:flex; gap:8px; align-items:flex-start; font-size:13px; color:var(--text2); }
+.story-num { width:16px; height:16px; border-radius:50%; background:var(--bg4); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--cyan-bright); flex-shrink:0; margin-top:1px; }
+.cal-nav { display:flex; justify-content:space-between; margin-top:12px; }
+.cal-nav button { background:var(--bg3); border:1px solid var(--border); color:var(--text2); padding:7px 14px; border-radius:var(--rsm); font-size:13px; cursor:pointer; font-family:inherit; }
+.cal-nav button:hover { border-color:var(--border2); color:var(--text); }
+.cal-nav button:disabled { opacity:.3; cursor:not-allowed; }
+
+/* ── VIRAL REFS ── */
+.viral-grid { display:flex; flex-direction:column; gap:10px; }
+.viral-card { background:var(--bg3); border-radius:var(--rsm); padding:14px; border-left:2px solid var(--cyan); position:relative; }
+.viral-rank { position:absolute; top:12px; right:14px; font-family:var(--serif); font-size:20px; font-weight:600; color:var(--border2); }
+.viral-handle { font-size:14.5px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.viral-handle a { color:var(--text); text-decoration:none; }
+.viral-handle a:hover { color:var(--cyan-bright); }
+.viral-tipo { font-size:12.5px; color:var(--text2); margin-bottom:8px; line-height:1.5; }
+.viral-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px; }
+.viral-item-title { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:3px; }
+.viral-item-text { font-size:12px; color:var(--text2); line-height:1.5; }
+
+/* ── ENTREGA HEADER ── */
+.entrega-header { background:linear-gradient(135deg,var(--cyan-dim),rgba(74,222,156,.05)); border:1px solid var(--border2); border-radius:var(--r); padding:18px 22px; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+.entrega-badge { background:var(--good); color:var(--bg-deep); border-radius:var(--rsm); padding:4px 10px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; flex-shrink:0; }
+.entrega-title { font-family:var(--serif); font-size:17px; font-weight:600; }
+.entrega-sub { font-size:11.5px; color:var(--text2); margin-top:2px; }
+
+/* ── ACTIONS BAR ── */
+.actions-bar { display:flex; gap:8px; margin-top:4px; padding-top:14px; border-top:1px solid var(--border); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .insights-mets { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar {
+    width: 260px; transform: translateX(-260px); transition: transform .25s ease;
+    top: 0; left: 0; height: 100vh;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+  .mob-menu-btn { display: flex; align-items: center; }
+  .main-wrap { margin-left: 0; }
+  .page-content { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .mets { grid-template-columns: repeat(2,1fr); }
+  .sw { grid-template-columns: 1fr; }
+  .revenue-grid { grid-template-columns: 1fr; }
   .bench-grid { grid-template-columns: 1fr; }
+  .profile-hero { flex-direction: column; text-align: center; }
+  .score-area { text-align: center; }
+  .score-badge { align-self: center; }
   .quiz-opts.quiz-multi { grid-template-columns: 1fr; }
-  .comp-card { flex-direction: column; gap: 8px; }
+  .posts-grid-thumb { grid-template-columns: repeat(2,1fr); }
+  .insights-mets { grid-template-columns: repeat(2,1fr); }
+  .viral-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .mets { grid-template-columns: repeat(2,1fr); }
+  .insights-mets { grid-template-columns: repeat(2,1fr); }
+  .stage-jumps { flex-direction: column; }
+  .actions-bar { flex-direction: column; }
 }
 </style>
 </head>
 <body>
 <div class="grid-watermark"></div>
-<div class="app">
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-  <div class="header">
-    <div class="brand-row">
-      <div class="brand-mark"><span>Fx</span></div>
-      <div class="brand-text">
-        <h1>Analisador de Perfil <span class="accent">(InstaFex)</span></h1>
-        <div class="powered">OnFeX Technology®</div>
-      </div>
-    </div>
-    <div class="header-sub">
-      <div class="title">Diagnóstico Estratégico Completo de Perfil OnFeX</div>
-      <div class="desc">Análise técnica, posicionamento, oportunidades de crescimento e projeção de faturamento.</div>
-    </div>
-  </div>
+<div class="app-shell">
 
-  <div class="stepper" id="stepper">
-    <div class="step-pill active" data-step="1"><div class="sp-num">1</div><div class="sp-label">Coleta Inicial</div></div>
-    <div class="step-pill locked" data-step="2"><div class="sp-num">2</div><div class="sp-label">Análise Profunda</div></div>
-    <div class="step-pill locked" data-step="3"><div class="sp-num">3</div><div class="sp-label">Concorrência</div></div>
-    <div class="step-pill locked" data-step="4"><div class="sp-num">4</div><div class="sp-label">Planejamento</div></div>
-    <div class="step-pill locked" data-step="5"><div class="sp-num">5</div><div class="sp-label">Entrega Final</div></div>
-  </div>
-
-  <!-- FORM -->
-  <div id="form-area">
-    <div class="card">
-      <div class="card-title">Etapa 1 · Coleta Inicial de Dados</div>
-      <div class="field">
-        <label>@ do Instagram</label>
-        <input type="text" id="username" placeholder="@nomedocliente" />
-      </div>
-      <div class="field">
-        <label>Nicho do perfil</label>
-        <input type="text" id="niche" placeholder="Ex: Fitness, Gastronomia, Moda, Finanças, Beleza..." />
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-brandmark"><span>Fx</span></div>
+      <div class="sidebar-logo-text">
+        <div class="sidebar-logo-name">InstaFex</div>
+        <div class="sidebar-logo-sub">OnFeX Technology®</div>
       </div>
     </div>
 
-    <div class="err" id="err"></div>
-    <button class="btn-main" id="btn" onclick="runEtapa1()">Iniciar coleta de dados</button>
-  </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Análise</div>
+        <button class="nav-item active" id="nav-coleta" onclick="navigateTo('coleta')">
+          <span class="nav-icon">📊</span>
+          <span class="ni-label">Coleta de Dados</span>
+          <span class="ni-badge">✓</span>
+        </button>
+        <button class="nav-item" id="nav-analise" onclick="navigateTo('analise')">
+          <span class="nav-icon">🔍</span>
+          <span class="ni-label">Análise Profunda</span>
+          <span class="ni-badge">✓</span>
+        </button>
+        <button class="nav-item" id="nav-concorrencia" onclick="navigateTo('concorrencia')">
+          <span class="nav-icon">🏆</span>
+          <span class="ni-label">Concorrência</span>
+          <span class="ni-badge">✓</span>
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Estratégia</div>
+        <button class="nav-item" id="nav-planejamento" onclick="navigateTo('planejamento')">
+          <span class="nav-icon">📋</span>
+          <span class="ni-label">Planejamento</span>
+          <span class="ni-badge">✓</span>
+        </button>
+        <button class="nav-item" id="nav-entrega" onclick="navigateTo('entrega')">
+          <span class="nav-icon">📄</span>
+          <span class="ni-label">Entrega Final</span>
+          <span class="ni-badge">✓</span>
+        </button>
+      </div>
+    </nav>
 
-  <!-- LOADING -->
-  <div id="loading">
-    <div class="loader-orb">
-      <svg viewBox="0 0 100 100">
-        <circle class="loader-ring" cx="50" cy="50" r="42"></circle>
-        <circle class="loader-ring2" cx="50" cy="50" r="34"></circle>
-      </svg>
-      <div class="loader-core"></div>
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" onclick="resetAll()">↩ Nova análise</button>
+      <button class="sidebar-footer-btn" onclick="exportPDF()">⬇ Exportar PDF</button>
     </div>
-    <div class="lmsg" id="load-msg">Analisando parâmetros estratégicos do seu negócio</div>
-    <div class="lsub" id="lsub-text">OnFeX Technology® · Processando</div>
-    <div class="loader-bar-bg"><div class="loader-bar-fill" id="loader-bar"></div></div>
-    <div class="loader-pct" id="loader-pct">0%</div>
-  </div>
+  </aside>
 
-  <!-- RESULT -->
-  <div id="result">
-    <div id="result-inner"></div>
-    <div id="etapa2-area"></div>
-    <div id="etapa3-area"></div>
-    <div id="etapa4-area"></div>
-    <div id="etapa5-area"></div>
-    <div class="actions" id="result-actions" style="display:none;">
-      <button class="btn-s" onclick="reset()">← Nova análise</button>
-      <button class="btn-s p" onclick="exportPDF()">⬇ Exportar relatório</button>
-    </div>
-  </div>
+  <!-- ── MAIN ── -->
+  <div class="main-wrap">
+    <header class="topbar">
+      <button class="mob-menu-btn" onclick="openSidebar()">☰</button>
+      <div class="topbar-info">
+        <div class="topbar-title" id="topbar-title">Coleta Inicial de Dados</div>
+        <div class="topbar-sub" id="topbar-sub">Reunir informações públicas para análise preliminar</div>
+      </div>
+      <div class="topbar-profile" id="topbar-profile" style="display:none;">
+        <div class="topbar-avatar" id="topbar-avatar">?</div>
+        <div class="topbar-handle" id="topbar-handle"></div>
+      </div>
+    </header>
 
+    <main class="page-content" id="page-content">
+      <!-- rendered by JS -->
+    </main>
+  </div>
 </div>
-<script>
-const LOAD_MESSAGES = [
-  'Coletando dados públicos do perfil',
-  'Lendo biografia, destaques e publicações recentes',
-  'Mapeando métricas visíveis e presença digital',
-  'Identificando posicionamento e tom de comunicação'
-];
-let loadMsgInterval;
-let etapa1Data = null;
-let etapa3Data = null;
-let quizAnswers = null;
 
-function n(s) { return parseInt((s||'0').replace(/\D/g,'')) || 0; }
-function fmt(v) { return v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(v); }
+<script>
+/* ────────────────── STATE ────────────────── */
+let etapa1Data = null;
+let etapa2Data = null;
+let etapa3Data = null;
+let finalReportData = null;
+let quizAnswers = null;
+let currentSection = 'coleta';
+let loadMsgInterval, progressInterval;
+let currentCalDay = 1, calendarData = [];
+
+const SECTIONS = {
+  coleta:       { title: 'Coleta Inicial de Dados',      sub: 'Levantamento público do perfil, métricas e posicionamento' },
+  analise:      { title: 'Análise Profunda da Conta',    sub: 'Métricas internas via login oficial do Instagram' },
+  concorrencia: { title: 'Análise de Concorrência',      sub: 'Mapeamento de mercado e diferenciais competitivos' },
+  planejamento: { title: 'Planejamento Estratégico',     sub: 'Diagnóstico e criação do cronograma personalizado' },
+  entrega:      { title: 'Entrega Final',                sub: 'Documento estratégico completo gerado pela IA OnFeX' }
+};
+
+/* ────────────────── UTILS ────────────────── */
+function fmt(v) { return !v ? '0' : v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(v); }
 function sc_color(v) { return v >= 70 ? 'var(--good)' : v >= 40 ? 'var(--warn)' : 'var(--bad)'; }
 function pclass(p) { return p === 'Alta' ? 'ph' : (p === 'Media' || p === 'Média') ? 'pm' : 'pl'; }
-function showErr(m) { const e = document.getElementById('err'); e.textContent = '⚠ ' + m; e.style.display = 'block'; }
-
-function startLoadingMessages() {
-  let i = 0;
-  const el = document.getElementById('load-msg');
-  el.textContent = LOAD_MESSAGES[0];
-  loadMsgInterval = setInterval(() => {
-    i = (i + 1) % LOAD_MESSAGES.length;
-    el.style.opacity = 0;
-    setTimeout(() => { el.textContent = LOAD_MESSAGES[i]; el.style.opacity = 1; }, 300);
-  }, 2600);
-}
-function stopLoadingMessages() { clearInterval(loadMsgInterval); }
-
-let progressInterval;
-function startProgress() {
-  const bar = document.getElementById('loader-bar');
-  const pct = document.getElementById('loader-pct');
-  let elapsed = 0;
-  const expectedTotal = 35; // Etapa 1 é só Apify + 1 chamada rápida de IA, bem mais leve que o relatório final
-  progressInterval = setInterval(() => {
-    elapsed += 0.4;
-    let pct_value = Math.min(96, 100 * (1 - Math.exp(-elapsed / expectedTotal)));
-    bar.style.width = pct_value.toFixed(0) + '%';
-    pct.textContent = pct_value.toFixed(0) + '%';
-  }, 400);
-}
-function finishProgress() {
-  clearInterval(progressInterval);
-  const bar = document.getElementById('loader-bar');
-  const pct = document.getElementById('loader-pct');
-  bar.style.width = '100%';
-  pct.textContent = '100%';
-}
-function resetProgress() {
-  clearInterval(progressInterval);
-  const bar = document.getElementById('loader-bar');
-  const pct = document.getElementById('loader-pct');
-  if (bar) bar.style.width = '0%';
-  if (pct) pct.textContent = '0%';
-}
-
-async function runEtapa1() {
-  const username = document.getElementById('username').value.trim();
-  const niche = document.getElementById('niche').value.trim();
-  document.getElementById('err').style.display = 'none';
-  if (!username) { showErr('Informe o @ do Instagram.'); return; }
-  if (!niche) { showErr('Informe o nicho do perfil.'); return; }
-
-  document.getElementById('form-area').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('result').style.display = 'none';
-  resetProgress();
-  startLoadingMessages();
-  startProgress();
-
-  const handle = username.replace('@', '');
-  let profile = null;
-
-  // 1. Coleta via Apify — obrigatório, sem dados reais não seguimos
-  try {
-    const apifyController = new AbortController();
-    const apifyTimeout = setTimeout(() => apifyController.abort(), 100000);
-
-    const apifyRes = await fetch('/api/apify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: handle }),
-      signal: apifyController.signal
-    });
-    clearTimeout(apifyTimeout);
-
-    let apifyData;
-    try { apifyData = await apifyRes.json(); }
-    catch { throw new Error('O servidor não respondeu corretamente (possível timeout). Tente novamente.'); }
-
-    if (!apifyRes.ok || apifyData.error) throw new Error(apifyData.error || 'Não foi possível obter dados reais do perfil.');
-    profile = apifyData;
-  } catch (e) {
-    stopLoadingMessages(); clearInterval(progressInterval);
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('form-area').style.display = 'block';
-    showErr(e.name === 'AbortError'
-      ? 'Não foi possível buscar os dados a tempo (timeout). Tente novamente.'
-      : 'Não foi possível obter dados reais do perfil: ' + e.message + '. Verifique se o @ está correto e se o perfil é público.');
-    return;
-  }
-
-  profile.niche = niche;
-  if (profile.followersCount > 0 && profile.avgLikes > 0) {
-    profile.engagementRate = (((profile.avgLikes + profile.avgComments) / profile.followersCount) * 100).toFixed(2);
-  }
-
-  // 2. Diagnóstico de posicionamento e comunicação (rápido, sem busca na web)
-  let positioning = null;
-  try {
-    const posController = new AbortController();
-    const posTimeout = setTimeout(() => posController.abort(), 60000);
-    const posRes = await fetch('/api/positioning', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileData: profile }),
-      signal: posController.signal
-    });
-    clearTimeout(posTimeout);
-    const posData = await posRes.json();
-    if (posRes.ok && !posData.error) positioning = posData;
-  } catch {
-    // Não bloqueia a Etapa 1 caso o diagnóstico de posicionamento falhe — dados do perfil já têm valor por si só
-  }
-
-  stopLoadingMessages();
-  finishProgress();
-  etapa1Data = { profile, positioning };
-  etapa3Data = null;
-  quizAnswers = null;
-  localStorage.setItem('instafex_etapa1', JSON.stringify(etapa1Data));
-  setTimeout(() => {
-    renderEtapa1(profile, positioning);
-    maybeAutoLoadEtapa2();
-  }, 300);
-}
-
-let currentCalDay = 1;
-let calendarData = [];
-
-function setStepperState(activeStep) {
-  document.querySelectorAll('.step-pill').forEach(el => {
-    const s = parseInt(el.dataset.step);
-    el.classList.remove('active', 'done', 'locked');
-    if (s < activeStep) el.classList.add('done');
-    else if (s === activeStep) el.classList.add('active');
-    else el.classList.add('locked');
-  });
-}
 
 function calcEtapa1Score(p) {
   let score = 0;
   const eng = parseFloat(p.engagementRate) || 0;
-  if (eng >= 6) score += 35; else if (eng >= 3) score += 28;
-  else if (eng >= 1) score += 18; else if (eng >= 0.5) score += 10; else score += 3;
+  if (eng >= 6) score += 35; else if (eng >= 3) score += 28; else if (eng >= 1) score += 18; else if (eng >= 0.5) score += 10; else score += 3;
   const f = p.followersCount || 0;
-  if (f >= 100000) score += 20; else if (f >= 50000) score += 16;
-  else if (f >= 10000) score += 12; else if (f >= 5000) score += 8;
-  else if (f >= 1000) score += 5; else score += 2;
+  if (f >= 100000) score += 20; else if (f >= 50000) score += 16; else if (f >= 10000) score += 12; else if (f >= 5000) score += 8; else if (f >= 1000) score += 5; else score += 2;
   const cad = p.cadenceDays;
-  if (!cad) score += 8; else if (cad <= 1) score += 20; else if (cad <= 2) score += 15;
-  else if (cad <= 3) score += 10; else if (cad <= 7) score += 5; else score += 1;
-  if (p.biography && p.biography.length > 80) score += 6;
-  else if (p.biography && p.biography.length > 20) score += 3;
+  if (!cad) score += 8; else if (cad <= 1) score += 20; else if (cad <= 2) score += 15; else if (cad <= 3) score += 10; else if (cad <= 7) score += 5; else score += 1;
+  if (p.biography && p.biography.length > 80) score += 6; else if (p.biography && p.biography.length > 20) score += 3;
   if (p.externalUrl) score += 5;
   if (p.isVerified) score += 4;
   if ((p.highlightCount || 0) >= 8) score += 5; else if ((p.highlightCount || 0) >= 3) score += 3;
@@ -738,26 +593,229 @@ function calcRevenue(followers, engRate) {
   const eng = parseFloat(engRate) || 0;
   const mult = eng >= 5 ? 1.5 : eng >= 3 ? 1.2 : eng >= 1 ? 1.0 : 0.6;
   let min, max;
-  if (followers < 3000) { min = 50; max = 150; }
-  else if (followers < 5000) { min = 100; max = 300; }
-  else if (followers < 10000) { min = 200; max = 600; }
-  else if (followers < 30000) { min = 500; max = 2000; }
-  else if (followers < 100000) { min = 1500; max = 6000; }
-  else if (followers < 500000) { min = 5000; max = 25000; }
-  else { min = 20000; max = 100000; }
+  if (followers < 3000) { min=50; max=150; } else if (followers < 5000) { min=100; max=300; }
+  else if (followers < 10000) { min=200; max=600; } else if (followers < 30000) { min=500; max=2000; }
+  else if (followers < 100000) { min=1500; max=6000; } else if (followers < 500000) { min=5000; max=25000; }
+  else { min=20000; max=100000; }
   const ppMin = Math.round(min * mult / 10) * 10;
   const ppMax = Math.round(max * mult / 10) * 10;
   return { ppMin, ppMax, mMin: ppMin * 4, mMax: ppMax * 8 };
 }
+function fmtMoney(n) { return n >= 1000 ? 'R$ ' + (n/1000).toFixed(n % 1000 === 0 ? 0 : 1)+'k' : 'R$ '+n; }
 
-function fmtMoney(n) {
-  if (n >= 1000) return 'R$ ' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
-  return 'R$ ' + n;
+/* ────────────────── NAVIGATION ────────────────── */
+function navigateTo(section) {
+  closeSidebar();
+  currentSection = section;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + section);
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('topbar-title').textContent = SECTIONS[section].title;
+  document.getElementById('topbar-sub').textContent = SECTIONS[section].sub;
+  renderSection(section);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function renderEtapa1(p, pos) {
-  document.getElementById('loading').style.display = 'none';
-  setStepperState(2);
+function markDone(section) {
+  const el = document.getElementById('nav-' + section);
+  if (el) el.classList.add('done');
+}
+
+function renderSection(section) {
+  const content = document.getElementById('page-content');
+  switch (section) {
+    case 'coleta':       renderColetaSection(content); break;
+    case 'analise':      renderAnaliseSection(content); break;
+    case 'concorrencia': renderConcorrenciaSection(content); break;
+    case 'planejamento': renderPlanejamentoSection(content); break;
+    case 'entrega':      renderEntregaSection(content); break;
+  }
+}
+
+function updateTopbarProfile(p) {
+  if (!p) return;
+  const el = document.getElementById('topbar-profile');
+  const av = document.getElementById('topbar-avatar');
+  const handle = document.getElementById('topbar-handle');
+  const init = (p.username || '?').charAt(0).toUpperCase();
+  av.textContent = init;
+  if (p.profilePicUrl) {
+    const img = document.createElement('img');
+    img.src = `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}`;
+    img.onerror = () => img.remove();
+    av.appendChild(img);
+  }
+  handle.textContent = '@' + (p.username || '');
+  el.style.display = 'flex';
+}
+
+/* ────────────────── SIDEBAR MOBILE ────────────────── */
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ────────────────── LOADING ────────────────── */
+const LOAD_MESSAGES = [
+  'Coletando dados públicos do perfil',
+  'Lendo biografia, destaques e publicações',
+  'Mapeando métricas e presença digital',
+  'Identificando posicionamento e comunicação'
+];
+
+function showLoadingInContent(msgs) {
+  const content = document.getElementById('page-content');
+  content.innerHTML = `
+    <div class="loading-wrap">
+      <div class="loader-orb">
+        <svg viewBox="0 0 100 100">
+          <circle class="loader-ring" cx="50" cy="50" r="42"></circle>
+          <circle class="loader-ring2" cx="50" cy="50" r="34"></circle>
+        </svg>
+        <div class="loader-core"></div>
+      </div>
+      <div class="lmsg" id="load-msg">${(msgs||LOAD_MESSAGES)[0]}</div>
+      <div class="lsub">OnFeX Technology® · Processando</div>
+      <div class="loader-bar-bg"><div class="loader-bar-fill" id="loader-bar"></div></div>
+      <div class="loader-pct" id="loader-pct">0%</div>
+    </div>`;
+  let i = 0;
+  const msgList = msgs || LOAD_MESSAGES;
+  clearInterval(loadMsgInterval);
+  loadMsgInterval = setInterval(() => {
+    i = (i + 1) % msgList.length;
+    const el = document.getElementById('load-msg');
+    if (!el) { clearInterval(loadMsgInterval); return; }
+    el.style.opacity = 0;
+    setTimeout(() => { if (el) { el.textContent = msgList[i]; el.style.opacity = 1; }}, 300);
+  }, 2600);
+  clearInterval(progressInterval);
+  let elapsed = 0;
+  progressInterval = setInterval(() => {
+    elapsed += 0.4;
+    const val = Math.min(96, 100 * (1 - Math.exp(-elapsed / 35)));
+    const bar = document.getElementById('loader-bar');
+    const pct = document.getElementById('loader-pct');
+    if (!bar) { clearInterval(progressInterval); return; }
+    bar.style.width = val.toFixed(0) + '%';
+    pct.textContent = val.toFixed(0) + '%';
+  }, 400);
+}
+
+function finishLoading() {
+  clearInterval(loadMsgInterval);
+  clearInterval(progressInterval);
+  const bar = document.getElementById('loader-bar');
+  const pct = document.getElementById('loader-pct');
+  if (bar) bar.style.width = '100%';
+  if (pct) pct.textContent = '100%';
+}
+
+function showErr(msg) {
+  const content = document.getElementById('page-content');
+  content.innerHTML = `
+    <div class="card">
+      <div class="err" style="display:block;">⚠ ${msg}</div>
+      <button class="btn-main" style="margin-top:12px;" onclick="navigateTo('coleta')">← Voltar para Coleta</button>
+    </div>`;
+}
+
+/* ────────────────── SEÇÃO 1 — COLETA DE DADOS ────────────────── */
+function renderColetaSection(content) {
+  if (etapa1Data) {
+    renderEtapa1Result(etapa1Data.profile, etapa1Data.positioning, content);
+  } else {
+    content.innerHTML = `
+      <div class="card">
+        <div class="card-title">Coleta Inicial de Dados</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6;">Informe os dados abaixo para iniciar a análise completa do perfil Instagram.</p>
+        <div class="field"><label>@ do Instagram</label><input type="text" id="username" placeholder="@nomedocliente" /></div>
+        <div class="field"><label>Nicho do perfil</label><input type="text" id="niche" placeholder="Ex: Fitness, Gastronomia, Moda, Finanças..." /></div>
+        <div class="err" id="form-err"></div>
+        <button class="btn-main" id="btn-start" onclick="runColeta()">Iniciar Coleta de Dados</button>
+      </div>
+
+      <div class="section-intro" style="margin-top:14px;">
+        <div class="section-intro-icon">📊</div>
+        <div class="section-intro-title">O que será coletado</div>
+        <div class="section-intro-sub">Análise completa dos dados públicos disponíveis no Instagram.</div>
+        <div class="section-checklist">
+          <div class="section-checklist-item"><div class="sc-dot">1</div>Levantamento de dados do perfil</div>
+          <div class="section-checklist-item"><div class="sc-dot">2</div>Análise de biografia, destaques e publicações</div>
+          <div class="section-checklist-item"><div class="sc-dot">3</div>Identificação de posicionamento e comunicação</div>
+          <div class="section-checklist-item"><div class="sc-dot">4</div>Nota da conta + projeção de faturamento</div>
+          <div class="section-checklist-item"><div class="sc-dot">5</div>Mapeamento de hashtags e cadência de posts</div>
+        </div>
+      </div>`;
+  }
+}
+
+async function runColeta() {
+  const username = document.getElementById('username')?.value?.trim();
+  const niche = document.getElementById('niche')?.value?.trim();
+  const errEl = document.getElementById('form-err');
+  if (errEl) errEl.style.display = 'none';
+  if (!username) { if (errEl) { errEl.textContent = '⚠ Informe o @ do Instagram.'; errEl.style.display = 'block'; } return; }
+  if (!niche) { if (errEl) { errEl.textContent = '⚠ Informe o nicho do perfil.'; errEl.style.display = 'block'; } return; }
+
+  showLoadingInContent(LOAD_MESSAGES);
+  const handle = username.replace('@', '');
+  let profile = null;
+
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 100000);
+    const res = await fetch('/api/apify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: handle }), signal: ctrl.signal
+    });
+    clearTimeout(t);
+    let data;
+    try { data = await res.json(); } catch { throw new Error('Servidor não respondeu. Tente novamente.'); }
+    if (!res.ok || data.error) throw new Error(data.error || 'Não foi possível obter dados do perfil.');
+    profile = data;
+  } catch (e) {
+    finishLoading();
+    renderColetaSection(document.getElementById('page-content'));
+    const errEl2 = document.getElementById('form-err');
+    if (errEl2) {
+      errEl2.textContent = '⚠ ' + (e.name === 'AbortError' ? 'Timeout ao buscar dados. Tente novamente.' : e.message);
+      errEl2.style.display = 'block';
+    }
+    return;
+  }
+
+  profile.niche = niche;
+  if (profile.followersCount > 0 && profile.avgLikes > 0) {
+    profile.engagementRate = (((profile.avgLikes + profile.avgComments) / profile.followersCount) * 100).toFixed(2);
+  }
+
+  let positioning = null;
+  try {
+    const posRes = await fetch('/api/positioning', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData: profile })
+    });
+    const posData = await posRes.json();
+    if (posRes.ok && !posData.error) positioning = posData;
+  } catch {}
+
+  finishLoading();
+  etapa1Data = { profile, positioning };
+  etapa3Data = null; quizAnswers = null; finalReportData = null;
+  localStorage.setItem('instafex_etapa1', JSON.stringify(etapa1Data));
+  markDone('coleta');
+  updateTopbarProfile(profile);
+
+  renderEtapa1Result(profile, positioning, document.getElementById('page-content'));
+  maybeAutoLoadEtapa2();
+}
+
+function renderEtapa1Result(p, pos, content) {
   const handle = p.username || '';
   const init = handle.charAt(0).toUpperCase();
   const picSrc = p.profilePicUrl ? `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}` : '';
@@ -774,69 +832,62 @@ function renderEtapa1(p, pos) {
             ${post.thumbnailUrl
               ? `<img src="${post.thumbnailUrl}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'post-no-thumb',textContent:'${post.type}'}));">`
               : `<div class="post-no-thumb">${post.type}</div>`}
-            <div class="post-thumb-badge">${post.type === 'Video' || post.type === 'Reel' || post.type === 'FEED_VIDEO' ? '▶' : '◻'} ${post.type}</div>
+            <div class="post-thumb-badge">${(post.type||'').includes('Video')||(post.type||'').includes('Reel') ? '▶' : '◻'} ${post.type}</div>
             <div class="post-thumb-overlay">
-              ${post.caption ? `<div style="font-size:9.5px;color:rgba(255,255,255,0.7);margin-bottom:4px;line-height:1.3;overflow:hidden;max-height:28px;">${post.caption.slice(0,55)}${post.caption.length>55?'…':''}</div>` : ''}
+              ${post.caption ? `<div style="font-size:9px;color:rgba(255,255,255,.7);margin-bottom:3px;line-height:1.3;overflow:hidden;max-height:26px;">${post.caption.slice(0,50)}${post.caption.length>50?'…':''}</div>` : ''}
               <div class="post-thumb-mets">♥ ${fmt(post.likesCount)} &nbsp;💬 ${fmt(post.commentsCount)}</div>
             </div>
           </div>`).join('')}
       </div>
     </div>` : '';
 
-  const hashtagsHtml = (p.topHashtags && p.topHashtags.length > 0) ? `
+  const posHtml = pos ? `
+    <div class="card">
+      <div class="card-title">Posicionamento e comunicação</div>
+      <div class="obs-list">
+        ${pos.tom_de_voz ? `<div class="obs-i"><div class="dotc"></div><span><strong>Tom de voz:</strong> ${pos.tom_de_voz}</span></div>` : ''}
+        ${pos.mensagem_central ? `<div class="obs-i"><div class="dotc"></div><span><strong>Mensagem central:</strong> ${pos.mensagem_central}</span></div>` : ''}
+        ${pos.publico_aparente ? `<div class="obs-i"><div class="dotc"></div><span><strong>Público aparente:</strong> ${pos.publico_aparente}</span></div>` : ''}
+        ${pos.consistencia_visual_texto ? `<div class="obs-i"><div class="dotc"></div><span><strong>Consistência:</strong> ${pos.consistencia_visual_texto}</span></div>` : ''}
+        ${pos.presenca_digital ? `<div class="obs-i"><div class="dotc"></div><span><strong>Presença digital:</strong> ${pos.presenca_digital}</span></div>` : ''}
+      </div>
+      ${(pos.observacoes && pos.observacoes.length) ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><div class="obs-list">${pos.observacoes.map(o => `<div class="obs-i"><div class="dotc"></div><span>${o}</span></div>`).join('')}</div></div>` : ''}
+    </div>` : '';
+
+  const hashHtml = (p.topHashtags && p.topHashtags.length > 0) ? `
     <div class="card">
       <div class="card-title">Hashtags mais recorrentes</div>
       <div>${p.topHashtags.map(h => `<span class="tag-chip">#${h}</span>`).join('')}</div>
     </div>` : '';
 
-  const positioningHtml = pos ? `
-    <div class="card">
-      <div class="card-title">Posicionamento e comunicação</div>
-      <div class="obs-list">
-        <div class="obs-i"><div class="dotc"></div><span><strong>Tom de voz:</strong> ${pos.tom_de_voz || '—'}</span></div>
-        <div class="obs-i"><div class="dotc"></div><span><strong>Mensagem central:</strong> ${pos.mensagem_central || '—'}</span></div>
-        <div class="obs-i"><div class="dotc"></div><span><strong>Público aparente:</strong> ${pos.publico_aparente || '—'}</span></div>
-        <div class="obs-i"><div class="dotc"></div><span><strong>Consistência:</strong> ${pos.consistencia_visual_texto || '—'}</span></div>
-        <div class="obs-i"><div class="dotc"></div><span><strong>Presença digital:</strong> ${pos.presenca_digital || '—'}</span></div>
-      </div>
-      ${(pos.observacoes && pos.observacoes.length) ? `
-        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-          <div class="obs-list">
-            ${pos.observacoes.map(o => `<div class="obs-i"><div class="dotc"></div><span>${o}</span></div>`).join('')}
-          </div>
-        </div>` : ''}
-    </div>` : '';
-
-  const html = `
+  content.innerHTML = `
     <div class="profile-hero">
       <div class="avatar">
         ${init}
         ${picSrc ? `<img src="${picSrc}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
       </div>
-      <div class="pinfo" style="flex:1;min-width:0;">
+      <div class="pinfo">
         <div class="handle">@${handle}</div>
         <div class="sub">${p.fullName || ''}${p.businessCategoryName ? ' · ' + p.businessCategoryName : ''}</div>
         <div class="badges">
           ${p.isVerified ? '<span class="badge ba">✓ Verificado</span>' : ''}
-          <span class="source-tag">✦ Dados públicos coletados em tempo real</span>
+          <span class="source-tag">✦ Dados públicos em tempo real</span>
         </div>
       </div>
       <div class="score-badge">
         <div class="score-grade" style="color:${gradeColor};">${grade}</div>
-        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Nota</div>
+        <div style="font-size:9.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Nota</div>
         <div class="score-pts">${score}/100</div>
-        <div class="score-bar-wrap" style="margin-top:6px;">
-          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${score}%;background:${gradeColor};"></div></div>
-        </div>
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${score}%;background:${gradeColor};"></div></div></div>
       </div>
     </div>
 
-    <div class="mets">
+    <div class="mets" style="grid-template-columns:repeat(3,1fr);">
       <div class="met"><div class="v">${fmt(p.followersCount)}</div><div class="l">Seguidores</div></div>
       <div class="met"><div class="v">${fmt(p.followingCount)}</div><div class="l">Seguindo</div></div>
       <div class="met"><div class="v">${fmt(p.postsCount)}</div><div class="l">Posts</div></div>
       <div class="met"><div class="v">${p.engagementRate ? p.engagementRate+'%' : '—'}</div><div class="l">Engajamento</div></div>
-      <div class="met"><div class="v">${p.cadenceDays ? p.cadenceDays+'d' : '—'}</div><div class="l">Cadência</div></div>
+      <div class="met"><div class="v">${p.cadenceDays ? p.cadenceDays+'d' : '—'}</div><div class="l">Cadência média</div></div>
       <div class="met"><div class="v">${p.highlightCount || 0}</div><div class="l">Destaques</div></div>
     </div>
 
@@ -844,19 +895,13 @@ function renderEtapa1(p, pos) {
       <div class="card-title">Projeção de Faturamento — Mercado Influencer BR</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Estimativa baseada em seguidores, engajamento e benchmarks do mercado brasileiro</div>
       <div class="revenue-grid">
-        <div class="rev-box">
-          <div class="rev-v">${fmtMoney(rev.ppMin)} – ${fmtMoney(rev.ppMax)}</div>
-          <div class="rev-l">Por publicação patrocinada</div>
-        </div>
-        <div class="rev-box">
-          <div class="rev-v">${fmtMoney(rev.mMin)} – ${fmtMoney(rev.mMax)}</div>
-          <div class="rev-l">Potencial mensal (4–8 posts)</div>
-        </div>
+        <div class="rev-box"><div class="rev-v">${fmtMoney(rev.ppMin)} – ${fmtMoney(rev.ppMax)}</div><div class="rev-l">Por publicação patrocinada</div></div>
+        <div class="rev-box"><div class="rev-v">${fmtMoney(rev.mMin)} – ${fmtMoney(rev.mMax)}</div><div class="rev-l">Potencial mensal (4–8 posts)</div></div>
       </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text3);">Valores estimados. Faturamento real varia conforme nicho, qualidade da audiência e tipo de entrega.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3);">Valores estimados. Faturamento real varia conforme nicho, qualidade da audiência e tipo de entrega.</div>
     </div>
 
-    ${p.biography || p.externalUrl ? `
+    ${(p.biography || p.externalUrl) ? `
     <div class="card">
       <div class="card-title">Biografia e presença digital</div>
       <div class="bio-box">${p.biography || 'Bio não informada.'}</div>
@@ -864,245 +909,485 @@ function renderEtapa1(p, pos) {
     </div>` : ''}
 
     ${postsHtml}
-    ${hashtagsHtml}
-    ${positioningHtml}
+    ${hashHtml}
+    ${posHtml}
 
-    <div class="next-step-box" id="etapa1-next-box">
-      <div class="ns-t">✅ Etapa 1 concluída — escolha como continuar:</div>
+    <div class="next-step-box">
+      <div class="ns-t">✅ Coleta concluída — escolha a próxima análise:</div>
       <div class="stage-jumps" style="margin-top:10px;">
-        <button class="sj-btn" onclick="connectInstagram()">📊 Etapa 2<br><span style="font-size:10px;opacity:.7;">Análise Profunda</span></button>
-        <button class="sj-btn" onclick="skipToEtapa3()">🔍 Etapa 3<br><span style="font-size:10px;opacity:.7;">Concorrência</span></button>
-        <button class="sj-btn" onclick="renderQuiz()">📝 Etapa 4<br><span style="font-size:10px;opacity:.7;">Questionário</span></button>
+        <button class="sj-btn" onclick="navigateTo('analise')">🔍 Análise Profunda<br><span style="font-size:9.5px;opacity:.7;">Login Instagram</span></button>
+        <button class="sj-btn" onclick="navigateTo('concorrencia')">🏆 Concorrência<br><span style="font-size:9.5px;opacity:.7;">Benchmark de mercado</span></button>
+        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento<br><span style="font-size:9.5px;opacity:.7;">Quiz estratégico</span></button>
       </div>
     </div>
-  `;
 
-  document.getElementById('result-inner').innerHTML = html;
-  document.getElementById('etapa2-area').innerHTML = '';
-  document.getElementById('etapa3-area').innerHTML = '';
-  document.getElementById('etapa4-area').innerHTML = '';
-  document.getElementById('etapa5-area').innerHTML = '';
-  document.getElementById('result-actions').style.display = 'none';
-  document.getElementById('result').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+    <div class="actions-bar">
+      <button class="btn-s" onclick="resetAll()">↩ Nova análise</button>
+      <button class="btn-s" onclick="runColeta()">🔄 Recolher dados</button>
+    </div>`;
 }
 
-/* ───────────── ETAPA 2 — Login oficial + Insights reais ───────────── */
-
-function connectInstagram() {
-  window.location.href = '/api/auth/start';
-}
-
-window.addEventListener('DOMContentLoaded', initFromUrl);
-
-async function initFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const erro = params.get('erro');
-  const conectado = params.get('conectado');
-  if (!erro && !conectado) return;
-
-  const saved = localStorage.getItem('instafex_etapa1');
-  if (saved) {
-    try {
-      etapa1Data = JSON.parse(saved);
-      document.getElementById('form-area').style.display = 'none';
-      renderEtapa1(etapa1Data.profile, etapa1Data.positioning);
-    } catch {}
+/* ────────────────── SEÇÃO 2 — ANÁLISE PROFUNDA ────────────────── */
+function renderAnaliseSection(content) {
+  if (etapa2Data) {
+    renderEtapa2Result(etapa2Data, content);
   } else {
-    // localStorage vazio (outro navegador, aba incógnita, etc.) — mostra área de resultado com instrução
-    document.getElementById('form-area').style.display = 'none';
-    document.getElementById('result-inner').innerHTML = `
-      <div class="next-step-box" style="margin-bottom:14px;">
-        <div class="ns-t">${conectado
-          ? '✅ Instagram conectado! Para continuar, informe o @ e o nicho do perfil abaixo.'
-          : '⚠ Retorno do Instagram detectado. Informe o @ e nicho para iniciar a análise.'
-        }</div>
-        <button class="btn-s" style="width:100%;margin-top:8px;" onclick="showFormFromReturn()">← Inserir @ e nicho para continuar</button>
+    content.innerHTML = `
+      <div class="section-intro">
+        <div class="section-intro-icon">🔍</div>
+        <div class="section-intro-title">Análise Profunda da Conta</div>
+        <div class="section-intro-sub">Conecte sua conta do Instagram para acessar métricas internas e receber uma análise estratégica completa com inteligência artificial.</div>
+        <div class="section-checklist">
+          <div class="section-checklist-item"><div class="sc-dot">✓</div>Login seguro via Instagram Official API</div>
+          <div class="section-checklist-item"><div class="sc-dot">✓</div>Alcance, engajamento e interações reais</div>
+          <div class="section-checklist-item"><div class="sc-dot">✓</div>Análise de audiência e comportamento por IA</div>
+          <div class="section-checklist-item"><div class="sc-dot">✓</div>Oportunidades de crescimento identificadas</div>
+        </div>
+        <button class="btn-main" style="max-width:340px;" onclick="connectInstagram()">Conectar conta do Instagram →</button>
+        <div style="margin-top:10px;">
+          <button class="btn-s" style="max-width:220px;display:inline-block;" onclick="navigateTo('concorrencia')">Pular para Concorrência →</button>
+        </div>
       </div>`;
-    document.getElementById('result').style.display = 'block';
   }
-
-  if (erro) {
-    showEtapa2Error(decodeURIComponent(erro));
-  } else if (conectado) {
-    await loadEtapa2Insights();
-  }
-  history.replaceState(null, '', window.location.pathname);
 }
 
-function showFormFromReturn() {
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('result-inner').innerHTML = '';
-  document.getElementById('form-area').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+function connectInstagram() { window.location.href = '/api/auth/start'; }
 
 async function maybeAutoLoadEtapa2() {
   try {
     const r = await fetch('/api/auth/status');
     const s = await r.json();
-    if (s.connected) {
-      document.getElementById('etapa1-next-box')?.remove();
-      await loadEtapa2Insights();
-    }
+    if (s.connected) loadEtapa2Insights();
   } catch {}
 }
 
-function showEtapa2Error(msg) {
-  const box = document.getElementById('etapa2-area');
-  if (!box) return;
-  document.getElementById('result').style.display = 'block';
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 2 · Análise Profunda</div>
-      <div class="err" style="display:block;">⚠ ${msg}</div>
-      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
-        <button class="btn-s" style="flex:1;" onclick="connectInstagram()">Tentar conectar novamente</button>
-        <button class="btn-s" style="flex:1;" onclick="skipToEtapa3()">Pular para Concorrência →</button>
-      </div>
-    </div>`;
-}
-
 async function loadEtapa2Insights() {
-  const box = document.getElementById('etapa2-area');
-  if (!box) return;
-  document.getElementById('result').style.display = 'block';
-  box.innerHTML = `<div class="card"><div class="card-title">Etapa 2 · Análise Profunda</div><div style="font-size:13px;color:var(--text2);">Carregando métricas internas da conta conectada...</div></div>`;
+  const content = document.getElementById('page-content');
+  if (currentSection !== 'analise') {
+    markDone('analise');
+    return;
+  }
+  content.innerHTML = `<div class="card"><div class="card-title">Análise Profunda da Conta</div><div class="inline-load"><div class="inline-spinner"></div><span>Carregando métricas internas da conta conectada...</span></div></div>`;
 
   try {
     const r = await fetch('/api/insights');
     const data = await r.json();
     if (!r.ok || data.error) throw new Error(data.error || 'Erro ao buscar Insights.');
-    renderEtapa2(data);
-    setStepperState(3);
+    etapa2Data = data;
+    markDone('analise');
+    renderEtapa2Result(data, content);
   } catch (e) {
-    showEtapa2Error(e.message);
+    content.innerHTML = `
+      <div class="card">
+        <div class="card-title">Análise Profunda da Conta</div>
+        <div class="err" style="display:block;">⚠ ${e.message}</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-s" onclick="connectInstagram()">Reconectar Instagram</button>
+          <button class="btn-s" onclick="navigateTo('concorrencia')">Pular →</button>
+        </div>
+      </div>`;
   }
 }
 
-function renderEtapa2(d) {
-  const box = document.getElementById('etapa2-area');
-  if (!box) return;
-
+function renderEtapa2Result(d, content) {
   const series = d.accountSeries || {};
-  const reachSeries = series.reach || [];
-  const interactionsSeries = series.total_interactions || [];
-  const reachTotal = reachSeries.reduce((a, v) => a + (v.value || 0), 0);
-  const interactionsTotal = interactionsSeries.reduce((a, v) => a + (v.value || 0), 0);
+  const reachTotal = (series.reach || []).reduce((a, v) => a + (v.value || 0), 0);
+  const interactionsTotal = (series.total_interactions || []).reduce((a, v) => a + (v.value || 0), 0);
+  const posts = d.posts || [];
+  const avgLikes = posts.length ? Math.round(posts.reduce((a,p) => a+(p.likeCount||0),0)/posts.length) : 0;
+  const avgComments = posts.length ? Math.round(posts.reduce((a,p) => a+(p.commentsCount||0),0)/posts.length) : 0;
+  const avgSaved = posts.length ? Math.round(posts.reduce((a,p) => a+(p.saved||0),0)/posts.length) : 0;
+  const engRate = d.followersCount > 0 && posts.length ? ((avgLikes + avgComments) / d.followersCount * 100).toFixed(2) : null;
 
-  const postsHtml = (d.posts || []).length > 0 ? `
-    <div class="posts-grid" style="margin-top:14px;">
-      ${d.posts.slice(0, 9).map(p => `
-        <div class="post-card">
-          ${p.thumbnailUrl
-            ? `<img src="${p.thumbnailUrl}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block;" loading="lazy" onerror="this.style.display='none'">`
-            : `<div class="pc-type">${p.mediaType}</div>`}
-          <div class="pc-cap">${p.caption || '<sem legenda>'}</div>
-          <div class="pc-mets">♥ ${fmt(p.likeCount)} · 💬 ${fmt(p.commentsCount)}${p.impressions != null ? ' · 👁 ' + fmt(p.impressions) : p.reach != null ? ' · 👁 ' + fmt(p.reach) : ''}${p.saved != null ? ' · 🔖 ' + fmt(p.saved) : ''}</div>
+  const topPosts = [...posts].sort((a,b) => (b.impressions||b.reach||0)-(a.impressions||a.reach||0)).slice(0,5);
+  const topPostsHtml = topPosts.length ? `
+    <div class="card">
+      <div class="card-title">Top ${topPosts.length} publicações por alcance</div>
+      ${topPosts.map((p,i) => `
+        <div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--bg4);color:var(--cyan-bright);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:3px;">${p.mediaType} · ${p.timestamp ? new Date(p.timestamp).toLocaleDateString('pt-BR') : ''}</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:5px;">${(p.caption||'Sem legenda').slice(0,90)}${(p.caption||'').length>90?'…':''}</div>
+            <div style="font-size:11.5px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;">
+              <span>♥ ${fmt(p.likeCount)}</span><span>💬 ${fmt(p.commentsCount)}</span>
+              ${p.impressions!=null?`<span>👁 ${fmt(p.impressions)}</span>`:''}
+              ${p.saved!=null?`<span>🔖 ${fmt(p.saved)}</span>`:''}
+            </div>
+          </div>
         </div>`).join('')}
-    </div>` : '<div style="font-size:13px;color:var(--text2);margin-top:10px;">Nenhum post recente com Insights disponível ainda.</div>';
+    </div>` : '';
 
   const warnings = [d.account_metrics_warning, d.media_warning].filter(Boolean);
 
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 2 · Análise Profunda — @${d.igUsername}</div>
-      <div class="badges" style="margin-bottom:14px;">
-        <span class="source-tag">✦ Conectado via login oficial do Instagram</span>
+  content.innerHTML = `
+    <div class="card" style="border-color:var(--border2);">
+      <div class="card-title">@${d.igUsername} · Conectado via Instagram</div>
+      <div style="margin-bottom:14px;"><span class="source-tag">✦ Login oficial do Instagram</span></div>
+      <div class="insights-mets">
+        <div class="ins-met"><div class="v">${d.followersCount!=null ? fmt(d.followersCount) : '—'}</div><div class="l">Seguidores</div></div>
+        <div class="ins-met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
+        <div class="ins-met"><div class="v">${fmt(interactionsTotal)}</div><div class="l">Interações</div></div>
+        <div class="ins-met"><div class="v">${engRate ? engRate+'%' : '—'}</div><div class="l">Engajamento</div></div>
       </div>
-      <div class="mets">
-        <div class="met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
-        <div class="met"><div class="v">${d.followersCount != null ? fmt(d.followersCount) : '—'}</div><div class="l">Seguidores (total)</div></div>
-        <div class="met"><div class="v">${interactionsTotal > 0 ? fmt(interactionsTotal) : (d.posts ? d.posts.length : 0)}</div><div class="l">${interactionsTotal > 0 ? 'Interações (período)' : 'Posts analisados'}</div></div>
+      ${posts.length > 0 ? `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;">
+        <div class="ins-met"><div class="v">${fmt(avgLikes)}</div><div class="l">Curtidas/post</div></div>
+        <div class="ins-met"><div class="v">${fmt(avgComments)}</div><div class="l">Comentários/post</div></div>
+        <div class="ins-met"><div class="v">${avgSaved > 0 ? fmt(avgSaved) : '—'}</div><div class="l">Salvamentos/post</div></div>
+      </div>` : ''}
+      ${warnings.length ? `<div style="margin-top:12px;font-size:11px;color:var(--text3);">⚠ ${warnings.join(' · ')}</div>` : ''}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <button class="btn-s" onclick="disconnectInstagram()" style="width:auto;padding:7px 14px;font-size:12.5px;">Desconectar conta</button>
       </div>
-      <div class="card-title" style="margin-top:18px;">Performance por publicação</div>
-      ${postsHtml}
-      ${warnings.length ? `<div style="margin-top:14px;font-size:11.5px;color:var(--text3);">⚠ Algumas métricas não puderam ser obtidas: ${warnings.join(' · ')}</div>` : ''}
-      <button class="btn-s" style="margin-top:16px;width:100%;" onclick="disconnectInstagram()">Desconectar conta</button>
     </div>
-    ${renderInsightsAnalysis(d.analysis, d.analysis_error)}
+
+    ${renderInsightsAnalysisHtml(d.analysis, d.analysis_error)}
+    ${topPostsHtml}
+
     <div class="next-step-box">
-      <div class="ns-t">✅ Etapa 2 concluída. Avance para a análise competitiva do mercado.</div>
-      <button class="btn-main" onclick="runEtapa3()">Iniciar Análise de Concorrência (Etapa 3) →</button>
-    </div>
-  `;
+      <div class="ns-t">✅ Análise Profunda concluída — continue a jornada:</div>
+      <div class="stage-jumps" style="margin-top:10px;">
+        <button class="sj-btn" onclick="navigateTo('concorrencia')">🏆 Concorrência</button>
+        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento</button>
+      </div>
+    </div>`;
 }
 
-function renderInsightsAnalysis(analysis, analysisError) {
+function renderInsightsAnalysisHtml(analysis, analysisError) {
   if (!analysis) return `
-    <div class="card" style="border-color:var(--border2);">
-      <div class="card-title">Análise de IA — Não disponível</div>
-      <div style="font-size:13px;color:var(--text3);">${analysisError ? '⚠ ' + analysisError : 'A análise por inteligência artificial não pôde ser gerada neste momento.'}</div>
+    <div class="card">
+      <div class="card-title">Análise por IA — Não disponível</div>
+      <div style="font-size:13px;color:var(--text3);">${analysisError ? '⚠ ' + analysisError : 'A análise de IA não pôde ser gerada neste momento.'}</div>
     </div>`;
 
-  const clsColor = { 'Baixo': 'var(--bad)', 'Médio': 'var(--warn)', 'Alto': 'var(--good)', 'Excelente': 'var(--cyan-bright)' };
+  const clsColor = { 'Baixo':'var(--bad)', 'Médio':'var(--warn)', 'Alto':'var(--good)', 'Excelente':'var(--cyan-bright)' };
   const engCls = analysis.engajamento?.classificacao || 'Médio';
   const engColor = clsColor[engCls] || 'var(--warn)';
 
   return `
     <div class="card" style="border-color:var(--border2);">
-      <div class="card-title">Análise de IA · Etapa 2</div>
+      <div class="card-title">Análise Estratégica por IA</div>
 
-      <div style="margin-bottom:20px;">
-        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Audiência & Comportamento</div>
-        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:10px;">${analysis.audiencia?.resumo || ''}</p>
-        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px;">
-          ${(analysis.audiencia?.insights || []).map(i => `<li style="font-size:13px;color:var(--text2);">${i}</li>`).join('')}
+      <div class="ai-section">
+        <div class="ai-section-title">Audiência & Comportamento</div>
+        <div class="ai-resumo">${analysis.audiencia?.resumo || ''}</div>
+        <ul class="ai-bullets">
+          ${(analysis.audiencia?.insights || []).map(i => `<li class="ai-bullet">${i}</li>`).join('')}
         </ul>
       </div>
 
-      <div style="margin-bottom:20px;padding-top:16px;border-top:1px solid var(--border);">
-        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <div class="ai-section" style="margin-top:10px;">
+        <div class="ai-section-title">
           Engajamento & Alcance
-          <span style="padding:2px 10px;border-radius:20px;background:var(--bg4);font-size:11px;color:${engColor};font-weight:700;">${engCls} · ${analysis.engajamento?.taxa || ''}</span>
+          <span class="ai-badge" style="color:${engColor};">${engCls} · ${analysis.engajamento?.taxa || ''}</span>
         </div>
-        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:10px;">${analysis.engajamento?.resumo || ''}</p>
-        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px;">
-          ${(analysis.engajamento?.insights || []).map(i => `<li style="font-size:13px;color:var(--text2);">${i}</li>`).join('')}
+        <div class="ai-resumo">${analysis.engajamento?.resumo || ''}</div>
+        <ul class="ai-bullets">
+          ${(analysis.engajamento?.insights || []).map(i => `<li class="ai-bullet">${i}</li>`).join('')}
         </ul>
       </div>
 
-      <div style="padding-top:16px;border-top:1px solid var(--border);">
-        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Oportunidades de Crescimento</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          ${(analysis.oportunidades || []).map((o, i) => `
-            <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:12px 14px;">
-              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${i + 1}. ${o.titulo}</div>
-              <div style="font-size:12.5px;color:var(--text2);line-height:1.55;">${o.descricao}</div>
-            </div>`).join('')}
-        </div>
+      <div class="ai-section" style="margin-top:10px;">
+        <div class="ai-section-title">Oportunidades de Crescimento</div>
+        ${(analysis.oportunidades || []).map((o,i) => `
+          <div class="opp-card">
+            <div class="opp-card-title">${i+1}. ${o.titulo}</div>
+            <div class="opp-card-desc">${o.descricao}</div>
+          </div>`).join('')}
       </div>
     </div>`;
 }
 
 async function disconnectInstagram() {
   await fetch('/api/auth/logout', { method: 'POST' });
-  document.getElementById('etapa2-area').innerHTML = '';
-  setStepperState(2);
-  const next = document.getElementById('result-inner');
-  if (next && !document.getElementById('etapa1-next-box')) {
-    next.insertAdjacentHTML('beforeend', `
-      <div class="next-step-box" id="etapa1-next-box">
-        <div class="ns-t">Conta desconectada. Conecte novamente para ver métricas internas, ou avance para a análise de concorrência.</div>
-        <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram (Etapa 2) →</button>
-        <button class="btn-s" style="margin-top:10px;width:100%;" onclick="skipToEtapa3()">Pular para Análise de Concorrência →</button>
-      </div>`);
+  etapa2Data = null;
+  document.getElementById('nav-analise').classList.remove('done');
+  renderAnaliseSection(document.getElementById('page-content'));
+}
+
+/* ────────────────── SEÇÃO 3 — CONCORRÊNCIA ────────────────── */
+function renderConcorrenciaSection(content) {
+  if (etapa3Data) {
+    renderEtapa3Result(etapa3Data, etapa1Data?.profile, content);
+    return;
+  }
+  if (!etapa1Data) {
+    content.innerHTML = `
+      <div class="section-intro">
+        <div class="section-intro-icon">🏆</div>
+        <div class="section-intro-title">Análise de Concorrência</div>
+        <div class="section-intro-sub">Para mapear os concorrentes, primeiro complete a Coleta Inicial de Dados do perfil.</div>
+        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('coleta')">← Ir para Coleta de Dados</button>
+      </div>`;
+    return;
+  }
+  content.innerHTML = `
+    <div class="section-intro">
+      <div class="section-intro-icon">🏆</div>
+      <div class="section-intro-title">Análise de Concorrência</div>
+      <div class="section-intro-sub">Mapeamento dos principais concorrentes no nicho <strong>${etapa1Data.profile.niche}</strong>, análise de posicionamento e benchmark estratégico.</div>
+      <div class="section-checklist">
+        <div class="section-checklist-item"><div class="sc-dot">✓</div>Mapeamento dos principais concorrentes</div>
+        <div class="section-checklist-item"><div class="sc-dot">✓</div>Análise de posicionamento e conteúdo</div>
+        <div class="section-checklist-item"><div class="sc-dot">✓</div>Benchmark: engajamento, frequência e formatos</div>
+        <div class="section-checklist-item"><div class="sc-dot">✓</div>Oportunidades e diferenciais identificados</div>
+      </div>
+      <button class="btn-main" style="max-width:300px;" onclick="runConcorrencia()">Iniciar Análise de Concorrência →</button>
+    </div>`;
+}
+
+async function runConcorrencia() {
+  if (!etapa1Data?.profile) { navigateTo('coleta'); return; }
+  const profile = etapa1Data.profile;
+  const content = document.getElementById('page-content');
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-title">Análise de Concorrência</div>
+      <div class="inline-load"><div class="inline-spinner"></div><span>Mapeando concorrentes no nicho <strong>${profile.niche}</strong>… (pode levar 1–2 min)</span></div>
+    </div>`;
+
+  try {
+    const r = await fetch('/api/competition', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData: profile })
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) throw new Error(data.error || 'Erro na análise de concorrência.');
+    etapa3Data = data;
+    markDone('concorrencia');
+    renderEtapa3Result(data, profile, content);
+  } catch (e) {
+    content.innerHTML = `
+      <div class="card">
+        <div class="card-title">Análise de Concorrência</div>
+        <div class="err" style="display:block;">⚠ ${e.message}</div>
+        <button class="btn-main" style="margin-top:12px;" onclick="runConcorrencia()">Tentar novamente</button>
+      </div>`;
   }
 }
 
-function renderFinalReport(r, p) {
-  document.getElementById('loading').style.display = 'none';
+function renderEtapa3Result(d, profile, content) {
+  const compsHtml = (d.concorrentes || []).map((c, i) => {
+    const handle = c.perfil.startsWith('@') ? c.perfil : '@' + c.perfil;
+    const slug = handle.replace('@', '');
+    return `<div class="comp-card">
+      <div class="comp-rank">${String(i+1).padStart(2,'0')}</div>
+      <div class="comp-body">
+        <div class="comp-handle"><a href="https://instagram.com/${slug}" target="_blank" rel="noopener">${handle} ↗</a></div>
+        <div class="comp-size">${c.seguidores_estimados || ''}</div>
+        <div class="comp-tipo">${c.tipo_conteudo || ''}</div>
+        ${c.pontos_fortes?.length ? `<div class="comp-tags">${c.pontos_fortes.map(p => `<span class="comp-tag">${p}</span>`).join('')}</div>` : ''}
+        ${c.pontos_fracos?.length ? `<div class="comp-tags">${c.pontos_fracos.map(p => `<span class="comp-tag bad">${p}</span>`).join('')}</div>` : ''}
+        ${c.diferencial ? `<div class="comp-dif">"${c.diferencial}"</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const bench = d.benchmark || {};
+  const oppsHtml = (d.oportunidades || []).map((o, i) => `<div class="opp-i"><div class="opp-num">${i+1}</div><span>${o}</span></div>`).join('');
+  const difHtml = (d.diferenciais_possiveis || []).map(df => `<div class="obs-i"><div class="dotc"></div><span>${df}</span></div>`).join('');
+
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-title">Concorrentes — Nicho: ${(profile||{}).niche || ''}</div>
+      <div class="comp-grid">${compsHtml}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Benchmark do mercado</div>
+      <div class="bench-grid">
+        <div class="bench-item"><div class="bench-label">Engajamento médio</div><div class="bench-value">${bench.media_engajamento_nicho || '—'}</div></div>
+        <div class="bench-item"><div class="bench-label">Frequência média</div><div class="bench-value">${bench.frequencia_media_posts || '—'}</div></div>
+        <div class="bench-item"><div class="bench-label">Formatos dominantes</div><div class="bench-value">${(bench.formatos_dominantes || []).join(', ') || '—'}</div></div>
+        <div class="bench-item"><div class="bench-label">Temas em alta</div><div class="bench-value">${(bench.temas_em_alta || []).join(' · ') || '—'}</div></div>
+      </div>
+      ${d.mapa_posicionamento ? `<div style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7;padding-top:12px;border-top:1px solid var(--border);">${d.mapa_posicionamento}</div>` : ''}
+    </div>
+
+    ${oppsHtml ? `<div class="card"><div class="card-title">Oportunidades identificadas</div><div class="opp-list">${oppsHtml}</div></div>` : ''}
+    ${difHtml ? `<div class="card"><div class="card-title">Diferenciais possíveis para @${(profile||{}).username||''}</div><div class="obs-list">${difHtml}</div></div>` : ''}
+
+    <div class="next-step-box">
+      <div class="ns-t">✅ Concorrência mapeada — avance para o planejamento:</div>
+      <div class="stage-jumps" style="margin-top:10px;">
+        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento Estratégico →</button>
+      </div>
+    </div>`;
+}
+
+/* ────────────────── SEÇÃO 4 — PLANEJAMENTO ────────────────── */
+function renderPlanejamentoSection(content) {
+  if (!etapa1Data) {
+    content.innerHTML = `
+      <div class="section-intro">
+        <div class="section-intro-icon">📋</div>
+        <div class="section-intro-title">Planejamento Estratégico</div>
+        <div class="section-intro-sub">Complete primeiro a Coleta de Dados para iniciar o diagnóstico estratégico.</div>
+        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('coleta')">← Ir para Coleta de Dados</button>
+      </div>`;
+    return;
+  }
+  if (finalReportData) {
+    content.innerHTML = `
+      <div class="card" style="text-align:center;padding:30px;">
+        <div style="font-size:36px;margin-bottom:10px;">✅</div>
+        <div style="font-size:16px;font-weight:600;color:var(--good);margin-bottom:8px;">Planejamento gerado com sucesso!</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">O relatório completo está disponível em Entrega Final.</div>
+        <div class="stage-jumps" style="justify-content:center;">
+          <button class="sj-btn" onclick="navigateTo('entrega')">📄 Ver Entrega Final →</button>
+          <button class="sj-btn" onclick="resetQuiz()">🔄 Refazer planejamento</button>
+        </div>
+      </div>`;
+    return;
+  }
+  renderQuizForm(content);
+}
+
+function resetQuiz() {
+  finalReportData = null;
+  quizAnswers = null;
+  document.getElementById('nav-entrega').classList.remove('done');
+  renderPlanejamentoSection(document.getElementById('page-content'));
+}
+
+function renderQuizForm(content) {
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-title">Diagnóstico Estratégico</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;">Responda às perguntas abaixo para que a IA personalize completamente seu planejamento.</p>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">1</span>Qual o tempo disponível para gravações?</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="q1" value="Menos de 1h por dia"> Menos de 1h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="1 a 3h por dia"> 1 a 3h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="Mais de 3h por dia"> Mais de 3h por dia</label>
+          <label class="quiz-opt"><input type="radio" name="q1" value="Apenas fins de semana"> Apenas fins de semana</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">2</span>Quem será responsável pela criação dos conteúdos?</div>
+        <div class="quiz-opts">
+          <label class="quiz-opt"><input type="radio" name="q2" value="Eu mesmo(a)"> Eu mesmo(a)</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Equipe interna"> Equipe interna</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Agência ou freelancer"> Agência ou freelancer</label>
+          <label class="quiz-opt"><input type="radio" name="q2" value="Misto (eu + terceiros)"> Misto (eu + terceiros)</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">3</span>Quais perfis ou marcas mais se aproximam da comunicação desejada?</div>
+        <input type="text" class="quiz-input" id="q3" placeholder="Ex: @leticiagattos, @gustavorocha, Marca X..." />
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">4</span>Quais são os objetivos principais do projeto?</div>
+        <div class="quiz-opts quiz-multi">
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Gerar vendas diretas"> Gerar vendas diretas</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Aumentar audiência"> Aumentar audiência</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Fortalecer a marca"> Fortalecer a marca</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Atrair parcerias"> Atrair parcerias</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Educar o público"> Educar o público</label>
+          <label class="quiz-opt"><input type="checkbox" name="q4" value="Lançar um produto/serviço"> Lançar produto/serviço</label>
+        </div>
+      </div>
+
+      <div class="quiz-q">
+        <div class="quiz-label"><span class="quiz-num">5</span>Quais produtos ou serviços possuem maior prioridade?</div>
+        <input type="text" class="quiz-input" id="q5" placeholder="Ex: Curso online de finanças, Consultoria 1:1, Produto físico X..." />
+      </div>
+
+      <button class="btn-main" style="margin-top:8px;" onclick="submitPlanejamento()">Gerar Planejamento Estratégico Completo →</button>
+      <div class="err" id="quiz-err" style="margin-top:10px;"></div>
+    </div>`;
+}
+
+async function submitPlanejamento() {
+  const q1 = document.querySelector('input[name="q1"]:checked')?.value || '';
+  const q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
+  const q3 = document.getElementById('q3')?.value?.trim() || 'Não informado';
+  const q4 = [...document.querySelectorAll('input[name="q4"]:checked')].map(i => i.value);
+  const q5 = document.getElementById('q5')?.value?.trim() || 'Não informado';
+  const errEl = document.getElementById('quiz-err');
+  if (!q1 || !q2) {
+    if (errEl) { errEl.textContent = '⚠ Responda pelo menos as perguntas 1 e 2.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  quizAnswers = {
+    tempo_gravacoes: q1, responsavel_conteudo: q2, perfis_referencia: q3,
+    objetivos: q4.length ? q4 : ['Não especificado'], produto_prioritario: q5
+  };
+
+  const content = document.getElementById('page-content');
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-title">Gerando Planejamento Estratégico</div>
+      <div class="inline-load"><div class="inline-spinner"></div><span>Criando planejamento personalizado com IA OnFeX… (pode levar até 3 minutos)</span></div>
+    </div>`;
+
+  const profileData = { ...(etapa1Data?.profile || {}), quizAnswers };
+
+  try {
+    const r = await fetch('/api/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData })
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) throw new Error(data.error || 'Erro ao gerar planejamento.');
+    finalReportData = data;
+    markDone('planejamento');
+    markDone('entrega');
+    navigateTo('entrega');
+  } catch (e) {
+    content.innerHTML = `
+      <div class="card">
+        <div class="card-title">Planejamento Estratégico</div>
+        <div class="err" style="display:block;">⚠ ${e.message}</div>
+        <button class="btn-main" style="margin-top:12px;" onclick="submitPlanejamento()">Tentar novamente</button>
+      </div>`;
+  }
+}
+
+/* ────────────────── SEÇÃO 5 — ENTREGA FINAL ────────────────── */
+function renderEntregaSection(content) {
+  if (!finalReportData) {
+    content.innerHTML = `
+      <div class="section-intro">
+        <div class="section-intro-icon">📄</div>
+        <div class="section-intro-title">Entrega Final</div>
+        <div class="section-intro-sub">Complete o Planejamento Estratégico para gerar o documento final com cronograma, recomendações e plano de ação.</div>
+        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('planejamento')">← Ir para Planejamento</button>
+      </div>`;
+    return;
+  }
+  renderFinalReport(finalReportData, etapa1Data?.profile || {}, content);
+}
+
+function renderFinalReport(r, p, content) {
   const clsMap = { 'Iniciante':'bb','Em crescimento':'bn','Intermediário':'bn','Avançado':'ba','Autoridade':'ba' };
   const scMap = { posicionamento:'Posicionamento', engajamento:'Engajamento', consistencia:'Consistência', bio_e_identidade:'Bio & identidade', estrategia_de_conteudo:'Estratégia de conteúdo' };
   const handle = p.username || '';
   const init = handle.charAt(0).toUpperCase();
   const finalPicSrc = p.profilePicUrl ? `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}` : '';
   const sc = r.nota_geral;
-
   calendarData = r.cronograma_30_dias || [];
   currentCalDay = 1;
 
-  let html = `
+  content.innerHTML = `
+    <div class="entrega-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <span class="entrega-badge">Entrega Final</span>
+        </div>
+        <div class="entrega-title">Documento Estratégico Completo</div>
+        <div class="entrega-sub">Gerado pela IA OnFeX com base em todas as etapas anteriores</div>
+      </div>
+    </div>
+
     <div class="profile-hero">
       <div class="avatar">
         ${init}
@@ -1112,9 +1397,9 @@ function renderFinalReport(r, p) {
         <div class="handle">@${handle}</div>
         <div class="sub">${p.niche || ''}</div>
         <div class="badges">
-          <span class="badge ${clsMap[r.classificacao]||'bn'}">${r.classificacao}</span>
+          <span class="badge ${clsMap[r.classificacao]||'bn'}">${r.classificacao || ''}</span>
           ${p.isVerified ? '<span class="badge ba">✓ Verificado</span>' : ''}
-          <span class="source-tag">✦ Dados verificados em tempo real via Instagram</span>
+          <span class="source-tag">✦ Dados verificados via Instagram</span>
         </div>
       </div>
       <div class="score-area">
@@ -1144,7 +1429,7 @@ function renderFinalReport(r, p) {
 
     <div class="card">
       <div class="card-title">Diagnóstico geral</div>
-      <div style="font-size:14px;color:var(--text2);line-height:1.8;">${r.diagnostico_geral}</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;">${r.diagnostico_geral || ''}</div>
     </div>
 
     ${r.projecao_faturamento ? `
@@ -1156,14 +1441,8 @@ function renderFinalReport(r, p) {
 
     <div class="card">
       <div class="sw">
-        <div class="sw-b">
-          <div class="sw-t g">Pontos fortes</div>
-          ${(r.pontos_fortes||[]).map(p=>`<div class="sw-i"><div class="dot g"></div><span>${p}</span></div>`).join('')}
-        </div>
-        <div class="sw-b">
-          <div class="sw-t r">Pontos fracos</div>
-          ${(r.pontos_fracos||[]).map(p=>`<div class="sw-i"><div class="dot r"></div><span>${p}</span></div>`).join('')}
-        </div>
+        <div class="sw-b"><div class="sw-t g">Pontos fortes</div>${(r.pontos_fortes||[]).map(pt=>`<div class="sw-i"><div class="dot g"></div><span>${pt}</span></div>`).join('')}</div>
+        <div class="sw-b"><div class="sw-t r">Pontos fracos</div>${(r.pontos_fracos||[]).map(pt=>`<div class="sw-i"><div class="dot r"></div><span>${pt}</span></div>`).join('')}</div>
       </div>
     </div>
 
@@ -1187,14 +1466,14 @@ function renderFinalReport(r, p) {
 
     <div class="summary">
       <div class="st">Próximos 30 dias — resumo executivo</div>
-      <div class="sc">${r.proximos_30_dias}</div>
+      <div class="sc">${r.proximos_30_dias || ''}</div>
     </div>
 
     ${calendarData.length > 0 ? `
     <div class="card">
-      <div class="card-title">Cronograma de conteúdo inteligente · 30 dias</div>
+      <div class="card-title">Cronograma de conteúdo · 30 dias</div>
       <div class="cal-tabs" id="cal-tabs">
-        ${calendarData.map(d => `<div class="cal-tab ${d.dia === 1 ? 'active' : ''}" data-day="${d.dia}" onclick="goToCalDay(${d.dia})">Dia ${d.dia}</div>`).join('')}
+        ${calendarData.map(d => `<div class="cal-tab ${d.dia===1?'active':''}" data-day="${d.dia}" onclick="goToCalDay(${d.dia})">Dia ${d.dia}</div>`).join('')}
       </div>
       <div id="cal-content"></div>
       <div class="cal-nav">
@@ -1205,58 +1484,34 @@ function renderFinalReport(r, p) {
 
     ${r.referencias_virais && r.referencias_virais.length > 0 ? `
     <div class="card">
-      <div class="card-title">Top 10 Referências do Segmento</div>
+      <div class="card-title">Top Referências do Segmento</div>
       <div class="viral-grid">
         ${r.referencias_virais.map((v,i) => `
           <div class="viral-card">
             <div class="viral-rank">${String(i+1).padStart(2,'0')}</div>
-            <div class="viral-handle">
-              <a href="https://instagram.com/${v.perfil.replace('@','')}" target="_blank" rel="noopener">${v.perfil.startsWith('@') ? v.perfil : '@'+v.perfil} ↗</a>
-            </div>
+            <div class="viral-handle"><a href="https://instagram.com/${v.perfil.replace('@','')}" target="_blank" rel="noopener">${v.perfil.startsWith('@')?v.perfil:'@'+v.perfil} ↗</a></div>
             <div class="viral-tipo">${v.tipo_conteudo}</div>
             <div class="viral-row">
-              <div>
-                <div class="viral-item-title">Por que funciona</div>
-                <div class="viral-item-text">${v.por_que_funciona}</div>
-              </div>
-              <div>
-                <div class="viral-item-title">Como adaptar</div>
-                <div class="viral-item-text">${v.o_que_adaptar}</div>
-              </div>
+              <div><div class="viral-item-title">Por que funciona</div><div class="viral-item-text">${v.por_que_funciona}</div></div>
+              <div><div class="viral-item-title">Como adaptar</div><div class="viral-item-text">${v.o_que_adaptar}</div></div>
             </div>
-          </div>
-        `).join('')}
+          </div>`).join('')}
       </div>
     </div>` : ''}
-  `;
 
-  const etapa5 = document.getElementById('etapa5-area');
-  etapa5.innerHTML = `
-    <div class="etapa5-header">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-          <span class="etapa5-badge">Etapa 5 — Entrega Final</span>
-        </div>
-        <div class="etapa5-title">Documento Estratégico Completo</div>
-        <div class="etapa5-sub">Gerado pela IA OnFeX com base em todas as etapas anteriores</div>
-      </div>
-    </div>
-    ${html}
-  `;
-  document.getElementById('result-actions').style.display = 'flex';
-  document.getElementById('result').style.display = 'block';
+    <div class="actions-bar">
+      <button class="btn-s" onclick="resetAll()">↩ Nova análise</button>
+      <button class="btn-s p" onclick="exportPDF()">⬇ Exportar PDF</button>
+    </div>`;
 
   if (calendarData.length > 0) renderCalDay(1);
-
   setTimeout(() => document.querySelectorAll('.bar-f').forEach(el => { el.style.width = el.dataset.w + '%'; }), 150);
-  etapa5.scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderCalDay(day) {
   const d = calendarData.find(x => x.dia === day);
   if (!d) return;
-  const el = document.getElementById('cal-content');
-  el.innerHTML = `
+  document.getElementById('cal-content').innerHTML = `
     <div class="cal-feed">
       <div class="cal-feed-label">📍 Feed do dia</div>
       <span class="formato-tag">${d.feed.formato}</span>
@@ -1266,293 +1521,81 @@ function renderCalDay(day) {
     <div class="cal-stories">
       <div class="cal-stories-label">Stories (3x)</div>
       ${(d.stories||[]).map((s,i) => `<div class="story-pill"><div class="story-num">${i+1}</div><span>${s}</span></div>`).join('')}
-    </div>
-  `;
+    </div>`;
   document.querySelectorAll('.cal-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.day) === day));
   document.getElementById('cal-prev').disabled = day <= 1;
   document.getElementById('cal-next').disabled = day >= calendarData.length;
-
-  const activeTab = document.querySelector('.cal-tab.active');
-  if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  const active = document.querySelector('.cal-tab.active');
+  if (active) active.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
 }
 function goToCalDay(day) { currentCalDay = day; renderCalDay(day); }
-function navCalDay(delta) {
-  const next = currentCalDay + delta;
-  if (next >= 1 && next <= calendarData.length) { currentCalDay = next; renderCalDay(next); }
-}
+function navCalDay(delta) { const n = currentCalDay + delta; if (n >= 1 && n <= calendarData.length) { currentCalDay = n; renderCalDay(n); } }
 
+/* ────────────────── PDF EXPORT ────────────────── */
 function exportPDF() {
-  const handle = document.getElementById('username')?.value?.replace('@','') || 'perfil';
-  const etapa5 = document.getElementById('etapa5-area');
-  const el = etapa5?.innerHTML ? etapa5 : document.getElementById('result-inner');
+  const handle = (etapa1Data?.profile?.username || 'perfil').replace('@','');
+  const el = document.getElementById('page-content');
+  if (!el || !el.innerHTML.trim()) {
+    alert('Navegue até Entrega Final para exportar o relatório completo.');
+    return;
+  }
   const opt = {
-    margin: [10,12,10,12],
+    margin: [10, 12, 10, 12],
     filename: `diagnostico-onfex-${handle}.pdf`,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, backgroundColor: '#060810', useCORS: true, windowWidth: el.scrollWidth },
+    html2canvas: { scale: 2, backgroundColor: '#060810', useCORS: true, logging: false },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
   html2pdf().set(opt).from(el).save();
 }
 
-/* ───────────── ETAPA 3 — Análise de Concorrência ───────────── */
-
-function skipToEtapa3() {
-  document.getElementById('etapa1-next-box')?.remove();
-  runEtapa3();
+/* ────────────────── RESET ────────────────── */
+function resetAll() {
+  etapa1Data = null; etapa2Data = null; etapa3Data = null;
+  finalReportData = null; quizAnswers = null;
+  calendarData = []; currentCalDay = 1;
+  localStorage.removeItem('instafex_etapa1');
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('done', 'active'));
+  document.getElementById('topbar-profile').style.display = 'none';
+  document.getElementById('topbar-avatar').textContent = '?';
+  document.getElementById('topbar-avatar').querySelectorAll('img').forEach(i => i.remove());
+  navigateTo('coleta');
 }
 
-async function runEtapa3() {
-  if (!etapa1Data?.profile) return;
-  const profile = etapa1Data.profile;
-  const box = document.getElementById('etapa3-area');
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 3 · Análise de Concorrência</div>
-      <div class="inline-load">
-        <div class="inline-spinner"></div>
-        <span>Mapeando concorrentes no nicho <strong>${profile.niche}</strong>... (pode levar 1-2 min)</span>
-      </div>
-    </div>`;
-  box.scrollIntoView({ behavior: 'smooth' });
-  setStepperState(3);
+/* ────────────────── OAUTH RETURN ────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const erro = params.get('erro');
+  const conectado = params.get('conectado');
 
-  try {
-    const r = await fetch('/api/competition', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileData: profile })
-    });
-    const data = await r.json();
-    if (!r.ok || data.error) throw new Error(data.error || 'Erro na análise de concorrência.');
-    etapa3Data = data;
-    renderEtapa3(data, profile);
-    setStepperState(4);
-  } catch (e) {
-    box.innerHTML = `
+  const saved = localStorage.getItem('instafex_etapa1');
+  if (saved) {
+    try {
+      etapa1Data = JSON.parse(saved);
+      markDone('coleta');
+      updateTopbarProfile(etapa1Data.profile);
+    } catch {}
+  }
+
+  if (conectado) {
+    history.replaceState(null, '', window.location.pathname);
+    navigateTo('analise');
+    loadEtapa2Insights();
+  } else if (erro) {
+    history.replaceState(null, '', window.location.pathname);
+    navigateTo('analise');
+    const content = document.getElementById('page-content');
+    content.innerHTML = `
       <div class="card">
-        <div class="card-title">Etapa 3 · Análise de Concorrência</div>
-        <div class="err" style="display:block;">⚠ ${e.message}</div>
-        <button class="btn-main" style="margin-top:12px;" onclick="runEtapa3()">Tentar novamente</button>
+        <div class="card-title">Análise Profunda da Conta</div>
+        <div class="err" style="display:block;">⚠ ${decodeURIComponent(erro)}</div>
+        <button class="btn-main" style="margin-top:12px;" onclick="connectInstagram()">Tentar conectar novamente</button>
       </div>`;
+  } else {
+    navigateTo('coleta');
   }
-}
-
-function renderEtapa3(d, profile) {
-  const box = document.getElementById('etapa3-area');
-
-  const compsHtml = (d.concorrentes || []).map((c, i) => {
-    const handle = c.perfil.startsWith('@') ? c.perfil : '@' + c.perfil;
-    const slug = handle.replace('@', '');
-    return `
-      <div class="comp-card">
-        <div class="comp-rank">${String(i + 1).padStart(2, '0')}</div>
-        <div class="comp-body">
-          <div class="comp-handle">
-            <a href="https://instagram.com/${slug}" target="_blank" rel="noopener">${handle} ↗</a>
-          </div>
-          <div class="comp-size">${c.seguidores_estimados || ''}</div>
-          <div class="comp-tipo">${c.tipo_conteudo || ''}</div>
-          ${c.pontos_fortes?.length ? `<div class="comp-tags">${c.pontos_fortes.map(p => `<span class="comp-tag">${p}</span>`).join('')}</div>` : ''}
-          ${c.pontos_fracos?.length ? `<div class="comp-tags">${c.pontos_fracos.map(p => `<span class="comp-tag bad">${p}</span>`).join('')}</div>` : ''}
-          ${c.diferencial ? `<div class="comp-dif">"${c.diferencial}"</div>` : ''}
-        </div>
-      </div>`;
-  }).join('');
-
-  const bench = d.benchmark || {};
-  const oppsHtml = (d.oportunidades || []).map((o, i) => `
-    <div class="opp-i"><div class="opp-num">${i + 1}</div><span>${o}</span></div>`).join('');
-
-  const difHtml = (d.diferenciais_possiveis || []).map(df => `
-    <div class="obs-i"><div class="dotc"></div><span>${df}</span></div>`).join('');
-
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 3 · Análise de Concorrência — Nicho: ${profile.niche}</div>
-      <div class="comp-grid">${compsHtml}</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Benchmark do mercado</div>
-      <div class="bench-grid">
-        <div class="bench-item">
-          <div class="bench-label">Engajamento médio</div>
-          <div class="bench-value">${bench.media_engajamento_nicho || '—'}</div>
-        </div>
-        <div class="bench-item">
-          <div class="bench-label">Frequência média</div>
-          <div class="bench-value">${bench.frequencia_media_posts || '—'}</div>
-        </div>
-        <div class="bench-item">
-          <div class="bench-label">Formatos dominantes</div>
-          <div class="bench-value">${(bench.formatos_dominantes || []).join(', ') || '—'}</div>
-        </div>
-        <div class="bench-item">
-          <div class="bench-label">Temas em alta</div>
-          <div class="bench-value">${(bench.temas_em_alta || []).join(' · ') || '—'}</div>
-        </div>
-      </div>
-      ${d.mapa_posicionamento ? `<div style="margin-top:14px;font-size:13px;color:var(--text2);line-height:1.7;padding-top:14px;border-top:1px solid var(--border);">${d.mapa_posicionamento}</div>` : ''}
-    </div>
-
-    ${oppsHtml ? `
-    <div class="card">
-      <div class="card-title">Oportunidades identificadas</div>
-      <div class="opp-list">${oppsHtml}</div>
-    </div>` : ''}
-
-    ${difHtml ? `
-    <div class="card">
-      <div class="card-title">Diferenciais possíveis para @${profile.username}</div>
-      <div class="obs-list">${difHtml}</div>
-    </div>` : ''}
-
-    <div class="next-step-box">
-      <div class="ns-t">✅ Etapa 3 concluída. Responda ao diagnóstico estratégico para gerar o planejamento personalizado.</div>
-      <button class="btn-main" onclick="renderQuiz()">Iniciar Planejamento Estratégico (Etapa 4) →</button>
-    </div>
-  `;
-}
-
-/* ───────────── ETAPA 4 — Quiz + Geração do Planejamento ───────────── */
-
-function renderQuiz() {
-  const box = document.getElementById('etapa4-area');
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 4 · Diagnóstico Estratégico</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6;">Responda às perguntas abaixo para que a IA personalize completamente seu planejamento.</p>
-
-      <div class="quiz-q">
-        <div class="quiz-label"><span class="quiz-num">1</span>Qual o tempo disponível para gravações?</div>
-        <div class="quiz-opts">
-          <label class="quiz-opt"><input type="radio" name="q1" value="Menos de 1h por dia"> Menos de 1h por dia</label>
-          <label class="quiz-opt"><input type="radio" name="q1" value="1 a 3h por dia"> 1 a 3h por dia</label>
-          <label class="quiz-opt"><input type="radio" name="q1" value="Mais de 3h por dia"> Mais de 3h por dia</label>
-          <label class="quiz-opt"><input type="radio" name="q1" value="Apenas fins de semana"> Apenas fins de semana</label>
-        </div>
-      </div>
-
-      <div class="quiz-q">
-        <div class="quiz-label"><span class="quiz-num">2</span>Quem será responsável pela criação dos conteúdos?</div>
-        <div class="quiz-opts">
-          <label class="quiz-opt"><input type="radio" name="q2" value="Eu mesmo(a)"> Eu mesmo(a)</label>
-          <label class="quiz-opt"><input type="radio" name="q2" value="Equipe interna"> Equipe interna</label>
-          <label class="quiz-opt"><input type="radio" name="q2" value="Agência ou freelancer"> Agência ou freelancer</label>
-          <label class="quiz-opt"><input type="radio" name="q2" value="Misto (eu + terceiros)"> Misto (eu + terceiros)</label>
-        </div>
-      </div>
-
-      <div class="quiz-q">
-        <div class="quiz-label"><span class="quiz-num">3</span>Quais perfis ou marcas mais se aproximam da sua comunicação desejada?</div>
-        <input type="text" class="quiz-input" id="q3" placeholder="Ex: @leticiagattos, @gustavorocha, Marca X..." />
-      </div>
-
-      <div class="quiz-q">
-        <div class="quiz-label"><span class="quiz-num">4</span>Quais são os objetivos principais do projeto?</div>
-        <div class="quiz-opts quiz-multi">
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Gerar vendas diretas"> Gerar vendas diretas</label>
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Aumentar audiência"> Aumentar audiência</label>
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Fortalecer a marca"> Fortalecer a marca</label>
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Atrair parcerias"> Atrair parcerias</label>
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Educar o público"> Educar o público</label>
-          <label class="quiz-opt"><input type="checkbox" name="q4" value="Lançar um produto/serviço"> Lançar um produto/serviço</label>
-        </div>
-      </div>
-
-      <div class="quiz-q">
-        <div class="quiz-label"><span class="quiz-num">5</span>Quais produtos ou serviços possuem maior prioridade?</div>
-        <input type="text" class="quiz-input" id="q5" placeholder="Ex: Curso online de finanças, Consultoria 1:1, Produto físico X..." />
-      </div>
-
-      <button class="btn-main" style="margin-top:8px;" onclick="submitEtapa4()">Gerar Planejamento Estratégico Completo →</button>
-      <div class="err" id="quiz-err" style="margin-top:10px;"></div>
-    </div>
-  `;
-  box.scrollIntoView({ behavior: 'smooth' });
-}
-
-async function submitEtapa4() {
-  const q1 = document.querySelector('input[name="q1"]:checked')?.value || '';
-  const q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
-  const q3 = document.getElementById('q3')?.value?.trim() || 'Não informado';
-  const q4 = [...document.querySelectorAll('input[name="q4"]:checked')].map(i => i.value);
-  const q5 = document.getElementById('q5')?.value?.trim() || 'Não informado';
-
-  const errEl = document.getElementById('quiz-err');
-  if (!q1 || !q2) {
-    errEl.textContent = '⚠ Responda pelo menos as perguntas 1 e 2 para continuar.';
-    errEl.style.display = 'block';
-    return;
-  }
-  errEl.style.display = 'none';
-
-  quizAnswers = {
-    tempo_gravacoes: q1,
-    responsavel_conteudo: q2,
-    perfis_referencia: q3,
-    objetivos: q4.length ? q4 : ['Não especificado'],
-    produto_prioritario: q5
-  };
-
-  const box = document.getElementById('etapa4-area');
-  box.innerHTML = `
-    <div class="card">
-      <div class="card-title">Etapa 4 · Gerando Planejamento Estratégico</div>
-      <div class="inline-load">
-        <div class="inline-spinner"></div>
-        <span>Gerando planejamento personalizado com IA OnFeX... (pode levar até 3 minutos)</span>
-      </div>
-    </div>`;
-  setStepperState(5);
-
-  const profileData = { ...(etapa1Data?.profile || {}), quizAnswers };
-
-  try {
-    const r = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileData })
-    });
-    const data = await r.json();
-    if (!r.ok || data.error) throw new Error(data.error || 'Erro ao gerar planejamento.');
-
-    box.innerHTML = `<div class="card" style="text-align:center;padding:20px;">
-      <div style="font-size:28px;margin-bottom:8px;">✅</div>
-      <div style="font-size:15px;font-weight:600;color:var(--good);">Planejamento gerado com sucesso!</div>
-    </div>`;
-
-    renderFinalReport(data, profileData);
-    setStepperState(6);
-  } catch (e) {
-    box.innerHTML = `
-      <div class="card">
-        <div class="card-title">Etapa 4 · Planejamento Estratégico</div>
-        <div class="err" style="display:block;">⚠ ${e.message}</div>
-        <button class="btn-main" style="margin-top:12px;" onclick="submitEtapa4()">Tentar novamente</button>
-      </div>`;
-    setStepperState(4);
-  }
-}
-
-function reset() {
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('form-area').style.display = 'block';
-  document.getElementById('err').style.display = 'none';
-  document.getElementById('result-inner').innerHTML = '';
-  document.getElementById('etapa2-area').innerHTML = '';
-  document.getElementById('etapa3-area').innerHTML = '';
-  document.getElementById('etapa4-area').innerHTML = '';
-  document.getElementById('etapa5-area').innerHTML = '';
-  document.getElementById('result-actions').style.display = 'none';
-  etapa1Data = null;
-  etapa3Data = null;
-  quizAnswers = null;
-  setStepperState(1);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+});
 </script>
 </body>
 </html>
