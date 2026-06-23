@@ -875,11 +875,59 @@ function renderEtapa2(d) {
       ${warnings.length ? `<div style="margin-top:14px;font-size:11.5px;color:var(--text3);">⚠ Algumas métricas não puderam ser obtidas: ${warnings.join(' · ')}</div>` : ''}
       <button class="btn-s" style="margin-top:16px;width:100%;" onclick="disconnectInstagram()">Desconectar conta</button>
     </div>
+    ${renderInsightsAnalysis(d.analysis)}
     <div class="next-step-box">
       <div class="ns-t">✅ Etapa 2 concluída. Avance para a análise competitiva do mercado.</div>
       <button class="btn-main" onclick="runEtapa3()">Iniciar Análise de Concorrência (Etapa 3) →</button>
     </div>
   `;
+}
+
+function renderInsightsAnalysis(analysis) {
+  if (!analysis) return `
+    <div class="card" style="border-color:var(--border2);">
+      <div class="card-title">Análise de IA — Não disponível</div>
+      <div style="font-size:13px;color:var(--text3);">A análise por inteligência artificial não pôde ser gerada neste momento.</div>
+    </div>`;
+
+  const clsColor = { 'Baixo': 'var(--bad)', 'Médio': 'var(--warn)', 'Alto': 'var(--good)', 'Excelente': 'var(--cyan-bright)' };
+  const engCls = analysis.engajamento?.classificacao || 'Médio';
+  const engColor = clsColor[engCls] || 'var(--warn)';
+
+  return `
+    <div class="card" style="border-color:var(--border2);">
+      <div class="card-title">Análise de IA · Etapa 2</div>
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Audiência & Comportamento</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:10px;">${analysis.audiencia?.resumo || ''}</p>
+        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px;">
+          ${(analysis.audiencia?.insights || []).map(i => `<li style="font-size:13px;color:var(--text2);">${i}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div style="margin-bottom:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+          Engajamento & Alcance
+          <span style="padding:2px 10px;border-radius:20px;background:var(--bg4);font-size:11px;color:${engColor};font-weight:700;">${engCls} · ${analysis.engajamento?.taxa || ''}</span>
+        </div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:10px;">${analysis.engajamento?.resumo || ''}</p>
+        <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px;">
+          ${(analysis.engajamento?.insights || []).map(i => `<li style="font-size:13px;color:var(--text2);">${i}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div style="padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Oportunidades de Crescimento</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${(analysis.oportunidades || []).map((o, i) => `
+            <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:12px 14px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;">${i + 1}. ${o.titulo}</div>
+              <div style="font-size:12.5px;color:var(--text2);line-height:1.55;">${o.descricao}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
 }
 
 async function disconnectInstagram() {
