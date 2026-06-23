@@ -354,6 +354,65 @@ body {
   cursor: not-allowed; font-family: var(--sans);
 }
 
+/* ── SCORE BADGE ── */
+.score-badge {
+  flex-shrink: 0; text-align: center;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 14px 18px; min-width: 82px;
+}
+.score-grade { font-family: var(--serif); font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+.score-pts { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+/* ── REVENUE CARD ── */
+.revenue-card {
+  background: linear-gradient(135deg, rgba(74,222,156,0.07), var(--bg2)) !important;
+  border-color: rgba(74,222,156,0.22) !important;
+}
+.revenue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.rev-box { background: var(--bg3); border-radius: 10px; padding: 14px; }
+.rev-v { font-size: 18px; font-weight: 700; color: var(--good); line-height: 1.2; }
+.rev-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* ── POSTS GRID WITH THUMBS (Etapa 1) ── */
+.posts-grid-thumb { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+.post-thumb-card {
+  position: relative; border-radius: 10px; overflow: hidden;
+  background: var(--bg3); aspect-ratio: 1; border: 1px solid var(--border);
+}
+.post-thumb-card img { width:100%; height:100%; object-fit:cover; display:block; }
+.post-thumb-overlay {
+  position:absolute; bottom:0; left:0; right:0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.80));
+  padding: 20px 7px 7px;
+}
+.post-thumb-mets { font-size: 10.5px; color: #fff; display:flex; gap:7px; }
+.post-thumb-badge {
+  position:absolute; top:6px; left:6px;
+  background: rgba(0,0,0,0.55); border-radius: 4px;
+  padding: 2px 5px; font-size: 9px; color: #fff;
+  font-weight: 600; text-transform: uppercase; letter-spacing:.04em;
+}
+.post-no-thumb {
+  width:100%; height:100%; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:8px;
+  text-align:center; color: var(--text3); font-size: 11px;
+}
+
+/* ── SCORE BAR ── */
+.score-bar-wrap { margin-top: 10px; }
+.score-bar-bg { height: 5px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+
+/* ── STAGE JUMP BUTTONS ── */
+.stage-jumps { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.sj-btn {
+  flex:1; min-width:110px; padding:9px 10px; border-radius:10px;
+  border:1px solid var(--border); background:var(--bg2); color:var(--text2);
+  font-size:11.5px; font-weight:500; cursor:pointer; text-align:center;
+  font-family:var(--sans); transition: border-color .15s, color .15s;
+}
+.sj-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+
 @media (max-width:600px) {
   .sw,.mets,.viral-row { grid-template-columns: 1fr; }
   .profile-hero { flex-direction: column; text-align: center; }
@@ -361,6 +420,9 @@ body {
   .actions { flex-direction: column; }
   .header-sub { margin-left: 0; margin-top: 12px; }
   .fat-range { font-size: 26px; }
+  .revenue-grid { grid-template-columns: 1fr; }
+  .score-badge { align-self: center; }
+  .posts-grid-thumb { grid-template-columns: repeat(2,1fr); }
 }
 @media (max-width: 380px) {
   .app { padding: 0 12px 70px; }
@@ -648,22 +710,75 @@ function setStepperState(activeStep) {
   });
 }
 
+function calcEtapa1Score(p) {
+  let score = 0;
+  const eng = parseFloat(p.engagementRate) || 0;
+  if (eng >= 6) score += 35; else if (eng >= 3) score += 28;
+  else if (eng >= 1) score += 18; else if (eng >= 0.5) score += 10; else score += 3;
+  const f = p.followersCount || 0;
+  if (f >= 100000) score += 20; else if (f >= 50000) score += 16;
+  else if (f >= 10000) score += 12; else if (f >= 5000) score += 8;
+  else if (f >= 1000) score += 5; else score += 2;
+  const cad = p.cadenceDays;
+  if (!cad) score += 8; else if (cad <= 1) score += 20; else if (cad <= 2) score += 15;
+  else if (cad <= 3) score += 10; else if (cad <= 7) score += 5; else score += 1;
+  if (p.biography && p.biography.length > 80) score += 6;
+  else if (p.biography && p.biography.length > 20) score += 3;
+  if (p.externalUrl) score += 5;
+  if (p.isVerified) score += 4;
+  if ((p.highlightCount || 0) >= 8) score += 5; else if ((p.highlightCount || 0) >= 3) score += 3;
+  const pc = p.postsCount || 0;
+  if (pc >= 200) score += 5; else if (pc >= 50) score += 3; else if (pc >= 20) score += 1;
+  const grade = score >= 85 ? 'A+' : score >= 75 ? 'A' : score >= 62 ? 'B' : score >= 48 ? 'C' : score >= 32 ? 'D' : 'F';
+  const gradeColor = (grade === 'A+' || grade === 'A') ? '#4ADE9C' : grade === 'B' ? '#6FCBEC' : grade === 'C' ? '#F0B25C' : '#F0625C';
+  return { score, grade, gradeColor };
+}
+
+function calcRevenue(followers, engRate) {
+  const eng = parseFloat(engRate) || 0;
+  const mult = eng >= 5 ? 1.5 : eng >= 3 ? 1.2 : eng >= 1 ? 1.0 : 0.6;
+  let min, max;
+  if (followers < 3000) { min = 50; max = 150; }
+  else if (followers < 5000) { min = 100; max = 300; }
+  else if (followers < 10000) { min = 200; max = 600; }
+  else if (followers < 30000) { min = 500; max = 2000; }
+  else if (followers < 100000) { min = 1500; max = 6000; }
+  else if (followers < 500000) { min = 5000; max = 25000; }
+  else { min = 20000; max = 100000; }
+  const ppMin = Math.round(min * mult / 10) * 10;
+  const ppMax = Math.round(max * mult / 10) * 10;
+  return { ppMin, ppMax, mMin: ppMin * 4, mMax: ppMax * 8 };
+}
+
+function fmtMoney(n) {
+  if (n >= 1000) return 'R$ ' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
+  return 'R$ ' + n;
+}
+
 function renderEtapa1(p, pos) {
   document.getElementById('loading').style.display = 'none';
-  setStepperState(2); // Etapa 1 concluída, Etapa 2 é a próxima (ainda bloqueada na navegação)
+  setStepperState(2);
   const handle = p.username || '';
   const init = handle.charAt(0).toUpperCase();
+  const picSrc = p.profilePicUrl ? `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}` : '';
+  const { score, grade, gradeColor } = calcEtapa1Score(p);
+  const rev = calcRevenue(p.followersCount || 0, p.engagementRate || 0);
 
   const posts = p.postsDetailed || [];
   const postsHtml = posts.length > 0 ? `
     <div class="card">
       <div class="card-title">Publicações recentes (${posts.length})</div>
-      <div class="posts-grid">
+      <div class="posts-grid-thumb">
         ${posts.slice(0, 9).map(post => `
-          <div class="post-card">
-            <div class="pc-type">${post.type}</div>
-            <div class="pc-cap">${post.caption ? post.caption : '<sem legenda>'}</div>
-            <div class="pc-mets">♥ ${fmt(post.likesCount)} · 💬 ${fmt(post.commentsCount)}</div>
+          <div class="post-thumb-card">
+            ${post.thumbnailUrl
+              ? `<img src="${post.thumbnailUrl}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'post-no-thumb',textContent:'${post.type}'}));">`
+              : `<div class="post-no-thumb">${post.type}</div>`}
+            <div class="post-thumb-badge">${post.type === 'Video' || post.type === 'Reel' || post.type === 'FEED_VIDEO' ? '▶' : '◻'} ${post.type}</div>
+            <div class="post-thumb-overlay">
+              ${post.caption ? `<div style="font-size:9.5px;color:rgba(255,255,255,0.7);margin-bottom:4px;line-height:1.3;overflow:hidden;max-height:28px;">${post.caption.slice(0,55)}${post.caption.length>55?'…':''}</div>` : ''}
+              <div class="post-thumb-mets">♥ ${fmt(post.likesCount)} &nbsp;💬 ${fmt(post.commentsCount)}</div>
+            </div>
           </div>`).join('')}
       </div>
     </div>` : '';
@@ -696,14 +811,22 @@ function renderEtapa1(p, pos) {
     <div class="profile-hero">
       <div class="avatar">
         ${init}
-        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
+        ${picSrc ? `<img src="${picSrc}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
       </div>
-      <div class="pinfo">
+      <div class="pinfo" style="flex:1;min-width:0;">
         <div class="handle">@${handle}</div>
         <div class="sub">${p.fullName || ''}${p.businessCategoryName ? ' · ' + p.businessCategoryName : ''}</div>
         <div class="badges">
           ${p.isVerified ? '<span class="badge ba">✓ Verificado</span>' : ''}
           <span class="source-tag">✦ Dados públicos coletados em tempo real</span>
+        </div>
+      </div>
+      <div class="score-badge">
+        <div class="score-grade" style="color:${gradeColor};">${grade}</div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Nota</div>
+        <div class="score-pts">${score}/100</div>
+        <div class="score-bar-wrap" style="margin-top:6px;">
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${score}%;background:${gradeColor};"></div></div>
         </div>
       </div>
     </div>
@@ -717,22 +840,40 @@ function renderEtapa1(p, pos) {
       <div class="met"><div class="v">${p.highlightCount || 0}</div><div class="l">Destaques</div></div>
     </div>
 
+    <div class="card revenue-card">
+      <div class="card-title">Projeção de Faturamento — Mercado Influencer BR</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Estimativa baseada em seguidores, engajamento e benchmarks do mercado brasileiro</div>
+      <div class="revenue-grid">
+        <div class="rev-box">
+          <div class="rev-v">${fmtMoney(rev.ppMin)} – ${fmtMoney(rev.ppMax)}</div>
+          <div class="rev-l">Por publicação patrocinada</div>
+        </div>
+        <div class="rev-box">
+          <div class="rev-v">${fmtMoney(rev.mMin)} – ${fmtMoney(rev.mMax)}</div>
+          <div class="rev-l">Potencial mensal (4–8 posts)</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text3);">Valores estimados. Faturamento real varia conforme nicho, qualidade da audiência e tipo de entrega.</div>
+    </div>
+
+    ${p.biography || p.externalUrl ? `
     <div class="card">
       <div class="card-title">Biografia e presença digital</div>
       <div class="bio-box">${p.biography || 'Bio não informada.'}</div>
-      <div style="margin-top:12px;font-size:13px;color:var(--text2);">
-        ${p.externalUrl ? `🔗 Link na bio: <a href="${p.externalUrl}" target="_blank" rel="noopener" style="color:var(--cyan-bright);">${p.externalUrl}</a>` : '🔗 Sem link na bio'}
-      </div>
-    </div>
+      ${p.externalUrl ? `<div style="margin-top:10px;font-size:13px;color:var(--text2);">🔗 <a href="${p.externalUrl}" target="_blank" rel="noopener" style="color:var(--cyan-bright);">${p.externalUrl}</a></div>` : ''}
+    </div>` : ''}
 
     ${postsHtml}
     ${hashtagsHtml}
     ${positioningHtml}
 
     <div class="next-step-box" id="etapa1-next-box">
-      <div class="ns-t">✅ Etapa 1 concluída. Para métricas internas avançadas, conecte a conta via login oficial — ou avance direto para a análise de concorrência.</div>
-      <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram (Etapa 2) →</button>
-      <button class="btn-s" style="margin-top:10px;width:100%;" onclick="skipToEtapa3()">Pular para Análise de Concorrência →</button>
+      <div class="ns-t">✅ Etapa 1 concluída — escolha como continuar:</div>
+      <div class="stage-jumps" style="margin-top:10px;">
+        <button class="sj-btn" onclick="connectInstagram()">📊 Etapa 2<br><span style="font-size:10px;opacity:.7;">Análise Profunda</span></button>
+        <button class="sj-btn" onclick="skipToEtapa3()">🔍 Etapa 3<br><span style="font-size:10px;opacity:.7;">Concorrência</span></button>
+        <button class="sj-btn" onclick="renderQuiz()">📝 Etapa 4<br><span style="font-size:10px;opacity:.7;">Questionário</span></button>
+      </div>
     </div>
   `;
 
@@ -955,6 +1096,7 @@ function renderFinalReport(r, p) {
   const scMap = { posicionamento:'Posicionamento', engajamento:'Engajamento', consistencia:'Consistência', bio_e_identidade:'Bio & identidade', estrategia_de_conteudo:'Estratégia de conteúdo' };
   const handle = p.username || '';
   const init = handle.charAt(0).toUpperCase();
+  const finalPicSrc = p.profilePicUrl ? `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}` : '';
   const sc = r.nota_geral;
 
   calendarData = r.cronograma_30_dias || [];
@@ -964,7 +1106,7 @@ function renderFinalReport(r, p) {
     <div class="profile-hero">
       <div class="avatar">
         ${init}
-        ${p.profilePicUrl ? `<img src="${p.profilePicUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
+        ${finalPicSrc ? `<img src="${finalPicSrc}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">` : ''}
       </div>
       <div class="pinfo">
         <div class="handle">@${handle}</div>
