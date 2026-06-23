@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+<title>Analisador de Perfil (InstaFex) — OnFeX</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* OnFeX palette — derived from brand mark */
+  --bg: #060810;
+  --bg-deep: #03040a;
+  --bg2: #0d0f1a;
+  --bg3: #131726;
+  --bg4: #1a1f33;
+  --border: rgba(125,211,240,0.10);
+  --border2: rgba(125,211,240,0.22);
+  --text: #F5F5F0;
+  --text2: #9CA3B8;
+  --text3: #5C6378;
+  --cyan: #6FCBEC;
+  --cyan-bright: #9FE0F7;
+  --cyan-dim: rgba(111,203,236,0.12);
+  --good: #4ADE9C;
+  --warn: #F0B25C;
+  --bad: #F0625C;
+  --r: 16px; --rsm: 10px;
+  --serif: 'Fraunces', serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(111,203,236,0.06), transparent 45%),
+    radial-gradient(circle at 90% 30%, rgba(111,203,236,0.04), transparent 50%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.app { max-width: 800px; margin: 0 auto; padding: 0 18px 90px; }
+
+/* ── GRID WATERMARK (echoes the logo's wireframe) ── */
+.grid-watermark {
+  position: fixed; inset: 0; z-index: -1; opacity: 0.4; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(111,203,236,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111,203,236,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black 0%, transparent 70%);
+}
+
+/* ── HEADER ── */
+.header { padding: 44px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+.brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.brand-mark {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg-deep);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.brand-mark::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(111,203,236,0.5) 0.5px, transparent 0.5px),
+    linear-gradient(90deg, rgba(111,203,236,0.5) 0.5px, transparent 0.5px);
+  background-size: 6px 6px;
+  transform: skewY(-6deg) scale(1.3);
+  opacity: 0.55;
+}
+.brand-mark span { position: relative; font-family: var(--serif); font-weight: 600; font-size: 17px; color: var(--text); z-index: 1; }
+.brand-text h1 { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.brand-text h1 .accent { color: var(--cyan-bright); font-style: italic; }
+.brand-text .powered { font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px; }
+.header-sub { margin-left: 60px; }
+.header-sub .title { font-size: 14px; color: var(--text); font-weight: 500; margin-bottom: 3px; }
+.header-sub .desc { font-size: 12.5px; color: var(--text3); line-height: 1.5; max-width: 480px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
+}
+.card-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::before { content: ''; width: 3px; height: 11px; background: var(--cyan); border-radius: 2px; display: inline-block; }
+
+/* ── FORM ── */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.field label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.field input {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--rsm); color: var(--text);
+  font-size: 15px; font-family: inherit;
+  padding: 13px 15px; outline: none; transition: all 0.18s;
+}
+.field input:focus { border-color: var(--cyan); background: var(--bg4); box-shadow: 0 0 0 3px var(--cyan-dim); }
+.field input::placeholder { color: var(--text3); }
+
+.btn-main {
+  width: 100%; padding: 16px;
+  background: var(--text);
+  color: var(--bg-deep); border: none; border-radius: var(--r);
+  font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: -0.1px;
+  transition: all 0.2s; margin-top: 6px;
+  font-family: var(--sans);
+}
+.btn-main:hover { background: var(--cyan-bright); transform: translateY(-1px); }
+.btn-main:active { transform: translateY(0); }
+.btn-main:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.err {
+  background: rgba(240,98,92,0.08); border: 1px solid rgba(240,98,92,0.2);
+  border-radius: var(--rsm); padding: 13px 16px;
+  font-size: 13px; color: var(--bad); margin-top: 12px; display: none;
+}
+
+/* ── LOADING (premium) ── */
+#loading { display: none; text-align: center; padding: 90px 20px 60px; }
+.loader-orb {
+  width: 88px; height: 88px; margin: 0 auto 32px; position: relative;
+}
+.loader-orb svg { width: 100%; height: 100%; }
+.loader-ring {
+  fill: none; stroke: var(--cyan); stroke-width: 1.4; opacity: 0.85;
+  stroke-dasharray: 4 230; stroke-linecap: round;
+  transform-origin: 50% 50%;
+  animation: orbit 2.2s linear infinite;
+}
+.loader-ring2 {
+  fill: none; stroke: var(--cyan-bright); stroke-width: 1; opacity: 0.4;
+  stroke-dasharray: 2 300;
+  transform-origin: 50% 50%;
+  animation: orbit 3.4s linear infinite reverse;
+}
+@keyframes orbit { to { transform: rotate(360deg); } }
+.loader-core {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--cyan-bright);
+  box-shadow: 0 0 18px 4px var(--cyan-dim);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{ opacity: 0.6; transform: translate(-50%,-50%) scale(1); } 50%{ opacity: 1; transform: translate(-50%,-50%) scale(1.4); } }
+#loading .lmsg { font-family: var(--serif); font-size: 17px; font-weight: 500; color: var(--text); margin-bottom: 8px; min-height: 26px; transition: opacity 0.3s; }
+#loading .lsub { font-size: 12px; color: var(--text3); letter-spacing: 0.04em; text-transform: uppercase; }
+.loader-bar-bg { width: 240px; height: 3px; background: var(--bg4); border-radius: 2px; margin: 22px auto 0; overflow: hidden; }
+.loader-bar-fill { height: 100%; width: 0%; background: var(--cyan); border-radius: 2px; transition: width 0.4s ease-out; }
+.loader-pct { font-family: var(--serif); font-size: 13px; color: var(--cyan-bright); margin-top: 10px; font-weight: 500; letter-spacing: 0.02em; }
+@keyframes sweep { 0%{ margin-left: -30%; } 100%{ margin-left: 100%; } }
+
+/* ── RESULT ── */
+#result { display: none; }
+
+.profile-hero {
+  display: flex; align-items: center; gap: 20px;
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px; margin-bottom: 14px; position: relative; overflow: hidden;
+}
+.profile-hero::after {
+  content: ''; position: absolute; top: -50%; right: -20%; width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(111,203,236,0.08), transparent 70%);
+  pointer-events: none;
+}
+.avatar {
+  width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg-deep); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--cyan-bright);
+  position: relative; z-index: 1;
+}
+.pinfo { flex: 1; position: relative; z-index: 1; }
+.pinfo .handle { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: -0.3px; }
+.pinfo .sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.pinfo .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+.ba { background: rgba(74,222,156,0.12); color: var(--good); }
+.bb { background: rgba(240,178,92,0.12); color: var(--warn); }
+.bn { background: var(--cyan-dim); color: var(--cyan-bright); }
+.score-area { text-align: right; flex-shrink: 0; position: relative; z-index: 1; }
+.score-big { font-family: var(--serif); font-size: 50px; font-weight: 600; letter-spacing: -2px; line-height: 1; }
+.score-sub { font-size: 10.5px; color: var(--text3); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.mets { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.met { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; text-align: center; }
+.met .v { font-family: var(--serif); font-size: 25px; font-weight: 600; }
+.met .l { font-size: 10.5px; color: var(--text3); margin-top: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.score-rows { display: flex; flex-direction: column; gap: 14px; }
+.srow { display: flex; flex-direction: column; gap: 5px; }
+.srow-h { display: flex; justify-content: space-between; font-size: 13px; }
+.srow-n { color: var(--text2); }
+.srow-v { font-weight: 600; font-family: var(--serif); }
+.bar-bg { background: var(--bg4); border-radius: 3px; height: 5px; overflow: hidden; }
+.bar-f { height: 5px; border-radius: 3px; transition: width 1.2s cubic-bezier(.16,1,.3,1); width: 0; background: var(--cyan); }
+
+/* faturamento */
+.fat-box {
+  background: linear-gradient(135deg, rgba(74,222,156,0.06), rgba(111,203,236,0.06));
+  border: 1px solid rgba(74,222,156,0.18);
+  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
+}
+.fat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--good); margin-bottom: 10px; }
+.fat-range { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.fat-range .sep { color: var(--text3); font-size: 22px; margin: 0 8px; }
+.fat-just { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.sw { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sw-b { background: var(--bg3); border-radius: var(--rsm); padding: 16px; }
+.sw-t { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 11px; }
+.sw-t.g { color: var(--good); }
+.sw-t.r { color: var(--bad); }
+.sw-i { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 9px; font-size: 13px; color: var(--text2); line-height: 1.5; }
+.dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.dot.g { background: var(--good); }
+.dot.r { background: var(--bad); }
+
+.plan-i { display: flex; gap: 14px; padding: 17px 0; border-bottom: 1px solid var(--border); }
+.plan-i:last-child { border-bottom: none; }
+.plan-n {
+  width: 27px; height: 27px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; background: var(--bg4); color: var(--cyan-bright);
+  border: 1px solid var(--border2);
+}
+.plan-c { flex: 1; }
+.plan-h { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; flex-wrap: wrap; }
+.plan-title { font-size: 14px; font-weight: 600; }
+.pprio { padding: 2px 8px; border-radius: 7px; font-size: 10.5px; font-weight: 600; }
+.ph { background: rgba(240,98,92,0.1); color: var(--bad); }
+.pm { background: rgba(240,178,92,0.1); color: var(--warn); }
+.pl { background: rgba(74,222,156,0.1); color: var(--good); }
+.plan-prazo { font-size: 11px; color: var(--text3); margin-left: auto; }
+.plan-d { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.bio-box {
+  background: var(--bg3); border-left: 2px solid var(--cyan);
+  border-radius: 0 var(--rsm) var(--rsm) 0; padding: 18px;
+  font-size: 14.5px; color: var(--text); line-height: 1.7; font-family: var(--serif); font-style: italic;
+}
+
+.summary {
+  background: linear-gradient(135deg, var(--cyan-dim), rgba(111,203,236,0.02));
+  border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 24px; margin-bottom: 14px;
+}
+.summary .st { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--cyan-bright); margin-bottom: 11px; }
+.summary .sc { font-size: 14px; color: var(--text2); line-height: 1.8; }
+
+/* CALENDAR 30 dias */
+.cal-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+.cal-tab {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text2); cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.cal-tab.active { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan-bright); }
+.cal-day { display: none; }
+.cal-day.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from{opacity:0; transform: translateY(4px);} to{opacity:1; transform: translateY(0);} }
+.cal-feed { background: var(--bg3); border-radius: var(--rsm); padding: 16px; margin-bottom: 12px; }
+.cal-feed-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cyan); margin-bottom: 8px; }
+.formato-tag { display: inline-block; background: var(--bg4); border-radius: 6px; padding: 3px 9px; font-size: 11.5px; color: var(--text2); margin-bottom: 6px; border: 1px solid var(--border); }
+.cal-pauta { font-weight: 600; color: var(--text); margin-bottom: 4px; font-size: 14px; }
+.cal-hook { font-size: 12.5px; color: var(--text3); font-style: italic; }
+.cal-stories { display: flex; flex-direction: column; gap: 8px; }
+.cal-stories-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px; }
+.story-pill { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text2); }
+.story-num { width: 16px; height: 16px; border-radius: 50%; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--cyan-bright); flex-shrink: 0; margin-top: 1px; }
+.cal-nav { display: flex; justify-content: space-between; margin-top: 14px; }
+.cal-nav button {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+  padding: 8px 16px; border-radius: var(--rsm); font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.cal-nav button:hover { border-color: var(--border2); color: var(--text); }
+.cal-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* VIRAL REFS */
+.viral-grid { display: flex; flex-direction: column; gap: 11px; }
+.viral-card { background: var(--bg3); border-radius: var(--rsm); padding: 16px; border-left: 2px solid var(--cyan); position: relative; }
+.viral-rank { position: absolute; top: 14px; right: 16px; font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--border2); }
+.viral-handle { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.viral-handle a { color: var(--text); text-decoration: none; }
+.viral-handle a:hover { color: var(--cyan-bright); }
+.viral-tipo { font-size: 12.5px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+.viral-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.viral-item-title { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 3px; }
+.viral-item-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+.actions { display: flex; gap: 10px; margin-top: 22px; }
+.btn-s {
+  flex: 1; padding: 13px; border-radius: var(--rsm);
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--text2); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: var(--sans);
+}
+.btn-s:hover { border-color: var(--border2); color: var(--text); }
+.btn-s.p { background: var(--text); border-color: var(--text); color: var(--bg-deep); }
+.btn-s.p:hover { background: var(--cyan-bright); border-color: var(--cyan-bright); }
+
+.source-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(74,222,156,0.08); border: 1px solid rgba(74,222,156,0.18);
+  color: var(--good); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+}
+
+/* ── STEPPER (5 etapas) ── */
+.stepper { display: flex; gap: 6px; margin-bottom: 22px; overflow-x: auto; padding-bottom: 4px; }
+.step-pill {
+  flex: 1; min-width: 92px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--rsm); padding: 10px 12px; text-align: center; position: relative;
+}
+.step-pill .sp-num {
+  width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; background: var(--bg4); color: var(--text3);
+}
+.step-pill .sp-label { font-size: 10px; color: var(--text3); letter-spacing: 0.02em; line-height: 1.3; }
+.step-pill.active { border-color: var(--cyan); background: var(--cyan-dim); }
+.step-pill.active .sp-num { background: var(--cyan); color: var(--bg-deep); }
+.step-pill.active .sp-label { color: var(--cyan-bright); font-weight: 600; }
+.step-pill.done .sp-num { background: var(--good); color: var(--bg-deep); }
+.step-pill.done .sp-label { color: var(--good); }
+.step-pill.locked { opacity: 0.45; }
+
+/* ── POSTS GRID (Etapa 1) ── */
+.posts-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.post-card { background: var(--bg3); border-radius: var(--rsm); padding: 10px; border: 1px solid var(--border); }
+.post-card .pc-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cyan); margin-bottom: 5px; }
+.post-card .pc-cap { font-size: 11px; color: var(--text2); line-height: 1.4; margin-bottom: 6px; min-height: 30px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post-card .pc-mets { font-size: 10.5px; color: var(--text3); }
+.tag-chip { display: inline-block; background: var(--bg4); border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; font-size: 11px; color: var(--text2); margin: 2px 4px 2px 0; }
+.obs-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.obs-i { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text2); line-height: 1.5; }
+.obs-i .dotc { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; margin-top: 7px; }
+.next-step-box {
+  background: var(--bg3); border: 1px dashed var(--border2); border-radius: var(--r);
+  padding: 20px; text-align: center; margin-top: 4px;
+}
+.next-step-box .ns-t { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+.btn-locked {
+  width: 100%; padding: 14px; background: var(--bg4); border: 1px solid var(--border);
+  color: var(--text3); border-radius: var(--rsm); font-size: 14px; font-weight: 600;
+  cursor: not-allowed; font-family: var(--sans);
+}
+
+@media (max-width:600px) {
+  .sw,.mets,.viral-row { grid-template-columns: 1fr; }
+  .profile-hero { flex-direction: column; text-align: center; }
+  .score-area { text-align: center; }
+  .actions { flex-direction: column; }
+  .header-sub { margin-left: 0; margin-top: 12px; }
+  .fat-range { font-size: 26px; }
+}
+@media (max-width: 380px) {
+  .app { padding: 0 12px 70px; }
+  .card { padding: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="grid-watermark"></div>
+<div class="app">
+
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark"><span>Fx</span></div>
+      <div class="brand-text">
+        <h1>Analisador de Perfil <span class="accent">(InstaFex)</span></h1>
+        <div class="powered">OnFeX Technology®</div>
+      </div>
+    </div>
+    <div class="header-sub">
+      <div class="title">Diagnóstico Estratégico Completo de Perfil OnFeX</div>
+      <div class="desc">Análise técnica, posicionamento, oportunidades de crescimento e projeção de faturamento.</div>
+    </div>
+  </div>
+
+  <div class="stepper" id="stepper">
+    <div class="step-pill active" data-step="1"><div class="sp-num">1</div><div class="sp-label">Coleta Inicial</div></div>
+    <div class="step-pill locked" data-step="2"><div class="sp-num">2</div><div class="sp-label">Análise Profunda</div></div>
+    <div class="step-pill locked" data-step="3"><div class="sp-num">3</div><div class="sp-label">Concorrência</div></div>
+    <div class="step-pill locked" data-step="4"><div class="sp-num">4</div><div class="sp-label">Planejamento</div></div>
+    <div class="step-pill locked" data-step="5"><div class="sp-num">5</div><div class="sp-label">Entrega Final</div></div>
+  </div>
+
+  <!-- FORM -->
+  <div id="form-area">
+    <div class="card">
+      <div class="card-title">Etapa 1 · Coleta Inicial de Dados</div>
+      <div class="field">
+        <label>@ do Instagram</label>
+        <input type="text" id="username" placeholder="@nomedocliente" />
+      </div>
+    </div>
+
+    <div class="err" id="err"></div>
+    <button class="btn-main" id="btn" onclick="runEtapa1()">Iniciar coleta de dados</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loader-orb">
+      <svg viewBox="0 0 100 100">
+        <circle class="loader-ring" cx="50" cy="50" r="42"></circle>
+        <circle class="loader-ring2" cx="50" cy="50" r="34"></circle>
+      </svg>
+      <div class="loader-core"></div>
+    </div>
+    <div class="lmsg" id="load-msg">Analisando parâmetros estratégicos do seu negócio</div>
+    <div class="lsub" id="lsub-text">OnFeX Technology® · Processando</div>
+    <div class="loader-bar-bg"><div class="loader-bar-fill" id="loader-bar"></div></div>
+    <div class="loader-pct" id="loader-pct">0%</div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <div id="result-inner"></div>
+    <div id="etapa2-area"></div>
+    <div class="actions">
+      <button class="btn-s" onclick="reset()">← Nova análise</button>
+      <button class="btn-s p" onclick="exportPDF()">⬇ Exportar relatório</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const LOAD_MESSAGES = [
+  'Coletando dados públicos do perfil',
+  'Lendo biografia, destaques e publicações recentes',
+  'Mapeando métricas visíveis e presença digital',
+  'Identificando posicionamento e tom de comunicação'
+];
+let loadMsgInterval;
+let etapa1Data = null; // guarda { profile, positioning } para reuso nas próximas etapas
+
+function n(s) { return parseInt((s||'0').replace(/\D/g,'')) || 0; }
+function fmt(v) { return v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(1)+'k' : String(v); }
+function sc_color(v) { return v >= 70 ? 'var(--good)' : v >= 40 ? 'var(--warn)' : 'var(--bad)'; }
+function pclass(p) { return p === 'Alta' ? 'ph' : (p === 'Media' || p === 'Média') ? 'pm' : 'pl'; }
+function showErr(m) { const e = document.getElementById('err'); e.textContent = '⚠ ' + m; e.style.display = 'block'; }
+
+function startLoadingMessages() {
+  let i = 0;
+  const el = document.getElementById('load-msg');
+  el.textContent = LOAD_MESSAGES[0];
+  loadMsgInterval = setInterval(() => {
+    i = (i + 1) % LOAD_MESSAGES.length;
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = LOAD_MESSAGES[i]; el.style.opacity = 1; }, 300);
+  }, 2600);
+}
+function stopLoadingMessages() { clearInterval(loadMsgInterval); }
+
+let progressInterval;
+function startProgress() {
+  const bar = document.getElementById('loader-bar');
+  const pct = document.getElementById('loader-pct');
+  let elapsed = 0;
+  const expectedTotal = 35; // Etapa 1 é só Apify + 1 chamada rápida de IA, bem mais leve que o relatório final
+  progressInterval = setInterval(() => {
+    elapsed += 0.4;
+    let pct_value = Math.min(96, 100 * (1 - Math.exp(-elapsed / expectedTotal)));
+    bar.style.width = pct_value.toFixed(0) + '%';
+    pct.textContent = pct_value.toFixed(0) + '%';
+  }, 400);
+}
+function finishProgress() {
+  clearInterval(progressInterval);
+  const bar = document.getElementById('loader-bar');
+  const pct = document.getElementById('loader-pct');
+  bar.style.width = '100%';
+  pct.textContent = '100%';
+}
+function resetProgress() {
+  clearInterval(progressInterval);
+  const bar = document.getElementById('loader-bar');
+  const pct = document.getElementById('loader-pct');
+  if (bar) bar.style.width = '0%';
+  if (pct) pct.textContent = '0%';
+}
+
+async function runEtapa1() {
+  const username = document.getElementById('username').value.trim();
+  document.getElementById('err').style.display = 'none';
+  if (!username) { showErr('Informe o @ do Instagram.'); return; }
+
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  resetProgress();
+  startLoadingMessages();
+  startProgress();
+
+  const handle = username.replace('@', '');
+  let profile = null;
+
+  // 1. Coleta via Apify — obrigatório, sem dados reais não seguimos
+  try {
+    const apifyController = new AbortController();
+    const apifyTimeout = setTimeout(() => apifyController.abort(), 100000);
+
+    const apifyRes = await fetch('/api/apify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: handle }),
+      signal: apifyController.signal
+    });
+    clearTimeout(apifyTimeout);
+
+    let apifyData;
+    try { apifyData = await apifyRes.json(); }
+    catch { throw new Error('O servidor não respondeu corretamente (possível timeout). Tente novamente.'); }
+
+    if (!apifyRes.ok || apifyData.error) throw new Error(apifyData.error || 'Não foi possível obter dados reais do perfil.');
+    profile = apifyData;
+  } catch (e) {
+    stopLoadingMessages(); clearInterval(progressInterval);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-area').style.display = 'block';
+    showErr(e.name === 'AbortError'
+      ? 'Não foi possível buscar os dados a tempo (timeout). Tente novamente.'
+      : 'Não foi possível obter dados reais do perfil: ' + e.message + '. Verifique se o @ está correto e se o perfil é público.');
+    return;
+  }
+
+  if (profile.followersCount > 0 && profile.avgLikes > 0) {
+    profile.engagementRate = (((profile.avgLikes + profile.avgComments) / profile.followersCount) * 100).toFixed(2);
+  }
+
+  // 2. Diagnóstico de posicionamento e comunicação (rápido, sem busca na web)
+  let positioning = null;
+  try {
+    const posController = new AbortController();
+    const posTimeout = setTimeout(() => posController.abort(), 60000);
+    const posRes = await fetch('/api/positioning', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileData: profile }),
+      signal: posController.signal
+    });
+    clearTimeout(posTimeout);
+    const posData = await posRes.json();
+    if (posRes.ok && !posData.error) positioning = posData;
+  } catch {
+    // Não bloqueia a Etapa 1 caso o diagnóstico de posicionamento falhe — dados do perfil já têm valor por si só
+  }
+
+  stopLoadingMessages();
+  finishProgress();
+  etapa1Data = { profile, positioning };
+  localStorage.setItem('instafex_etapa1', JSON.stringify(etapa1Data));
+  setTimeout(() => {
+    renderEtapa1(profile, positioning);
+    maybeAutoLoadEtapa2();
+  }, 300);
+}
+
+let currentCalDay = 1;
+let calendarData = [];
+
+function setStepperState(activeStep) {
+  document.querySelectorAll('.step-pill').forEach(el => {
+    const s = parseInt(el.dataset.step);
+    el.classList.remove('active', 'done', 'locked');
+    if (s < activeStep) el.classList.add('done');
+    else if (s === activeStep) el.classList.add('active');
+    else el.classList.add('locked');
+  });
+}
+
+function renderEtapa1(p, pos) {
+  document.getElementById('loading').style.display = 'none';
+  setStepperState(2); // Etapa 1 concluída, Etapa 2 é a próxima (ainda bloqueada na navegação)
+  const handle = p.username || '';
+  const init = handle.charAt(0).toUpperCase();
+
+  const posts = p.postsDetailed || [];
+  const postsHtml = posts.length > 0 ? `
+    <div class="card">
+      <div class="card-title">Publicações recentes (${posts.length})</div>
+      <div class="posts-grid">
+        ${posts.slice(0, 9).map(post => `
+          <div class="post-card">
+            <div class="pc-type">${post.type}</div>
+            <div class="pc-cap">${post.caption ? post.caption : '<sem legenda>'}</div>
+            <div class="pc-mets">♥ ${fmt(post.likesCount)} · 💬 ${fmt(post.commentsCount)}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  const hashtagsHtml = (p.topHashtags && p.topHashtags.length > 0) ? `
+    <div class="card">
+      <div class="card-title">Hashtags mais recorrentes</div>
+      <div>${p.topHashtags.map(h => `<span class="tag-chip">#${h}</span>`).join('')}</div>
+    </div>` : '';
+
+  const positioningHtml = pos ? `
+    <div class="card">
+      <div class="card-title">Posicionamento e comunicação</div>
+      <div class="obs-list">
+        <div class="obs-i"><div class="dotc"></div><span><strong>Tom de voz:</strong> ${pos.tom_de_voz || '—'}</span></div>
+        <div class="obs-i"><div class="dotc"></div><span><strong>Mensagem central:</strong> ${pos.mensagem_central || '—'}</span></div>
+        <div class="obs-i"><div class="dotc"></div><span><strong>Público aparente:</strong> ${pos.publico_aparente || '—'}</span></div>
+        <div class="obs-i"><div class="dotc"></div><span><strong>Consistência:</strong> ${pos.consistencia_visual_texto || '—'}</span></div>
+        <div class="obs-i"><div class="dotc"></div><span><strong>Presença digital:</strong> ${pos.presenca_digital || '—'}</span></div>
+      </div>
+      ${(pos.observacoes && pos.observacoes.length) ? `
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="obs-list">
+            ${pos.observacoes.map(o => `<div class="obs-i"><div class="dotc"></div><span>${o}</span></div>`).join('')}
+          </div>
+        </div>` : ''}
+    </div>` : '';
+
+  const html = `
+    <div class="profile-hero">
+      <div class="avatar">${init}</div>
+      <div class="pinfo">
+        <div class="handle">@${handle}</div>
+        <div class="sub">${p.fullName || ''}${p.businessCategoryName ? ' · ' + p.businessCategoryName : ''}</div>
+        <div class="badges">
+          ${p.isVerified ? '<span class="badge ba">✓ Verificado</span>' : ''}
+          <span class="source-tag">✦ Dados públicos coletados em tempo real</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mets">
+      <div class="met"><div class="v">${fmt(p.followersCount)}</div><div class="l">Seguidores</div></div>
+      <div class="met"><div class="v">${fmt(p.followingCount)}</div><div class="l">Seguindo</div></div>
+      <div class="met"><div class="v">${fmt(p.postsCount)}</div><div class="l">Posts</div></div>
+      <div class="met"><div class="v">${p.engagementRate ? p.engagementRate+'%' : '—'}</div><div class="l">Engajamento</div></div>
+      <div class="met"><div class="v">${p.cadenceDays ? p.cadenceDays+'d' : '—'}</div><div class="l">Cadência</div></div>
+      <div class="met"><div class="v">${p.highlightCount || 0}</div><div class="l">Destaques</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Biografia e presença digital</div>
+      <div class="bio-box">${p.biography || 'Bio não informada.'}</div>
+      <div style="margin-top:12px;font-size:13px;color:var(--text2);">
+        ${p.externalUrl ? `🔗 Link na bio: <a href="${p.externalUrl}" target="_blank" rel="noopener" style="color:var(--cyan-bright);">${p.externalUrl}</a>` : '🔗 Sem link na bio'}
+      </div>
+    </div>
+
+    ${postsHtml}
+    ${hashtagsHtml}
+    ${positioningHtml}
+
+    <div class="next-step-box" id="etapa1-next-box">
+      <div class="ns-t">✅ Etapa 1 concluída. Para a Etapa 2 (Análise Profunda), conecte a conta pelo login oficial do Instagram — você será redirecionado para a tela do Facebook/Instagram e nunca digita a senha aqui no site.</div>
+      <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram →</button>
+    </div>
+  `;
+
+  document.getElementById('result-inner').innerHTML = html;
+  document.getElementById('result').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ───────────── ETAPA 2 — Login oficial + Insights reais ───────────── */
+
+function connectInstagram() {
+  window.location.href = '/api/auth/start';
+}
+
+window.addEventListener('DOMContentLoaded', initFromUrl);
+
+async function initFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const erro = params.get('erro');
+  const conectado = params.get('conectado');
+  if (!erro && !conectado) return;
+
+  // Restaura a Etapa 1 salva localmente, pra não perder o contexto após o redirect do OAuth
+  const saved = localStorage.getItem('instafex_etapa1');
+  if (saved) {
+    try {
+      etapa1Data = JSON.parse(saved);
+      document.getElementById('form-area').style.display = 'none';
+      renderEtapa1(etapa1Data.profile, etapa1Data.positioning);
+    } catch {}
+  }
+
+  if (erro) {
+    showEtapa2Error(decodeURIComponent(erro));
+  } else if (conectado) {
+    await loadEtapa2Insights();
+  }
+  history.replaceState(null, '', window.location.pathname);
+}
+
+async function maybeAutoLoadEtapa2() {
+  try {
+    const r = await fetch('/api/auth/status');
+    const s = await r.json();
+    if (s.connected) {
+      document.getElementById('etapa1-next-box')?.remove();
+      await loadEtapa2Insights();
+    }
+  } catch {}
+}
+
+function showEtapa2Error(msg) {
+  const box = document.getElementById('etapa2-area');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="err" style="display:block;">⚠ ${msg}</div>
+    <button class="btn-main" style="margin-top:10px;" onclick="connectInstagram()">Tentar conectar novamente</button>`;
+}
+
+async function loadEtapa2Insights() {
+  const box = document.getElementById('etapa2-area');
+  if (!box) return;
+  box.innerHTML = `<div class="card"><div class="card-title">Etapa 2 · Análise Profunda</div><div style="font-size:13px;color:var(--text2);">Carregando métricas internas da conta conectada...</div></div>`;
+
+  try {
+    const r = await fetch('/api/insights');
+    const data = await r.json();
+    if (!r.ok || data.error) throw new Error(data.error || 'Erro ao buscar Insights.');
+    renderEtapa2(data);
+    setStepperState(3);
+  } catch (e) {
+    showEtapa2Error(e.message);
+  }
+}
+
+function renderEtapa2(d) {
+  const box = document.getElementById('etapa2-area');
+  if (!box) return;
+
+  const series = d.accountSeries || {};
+  const reachSeries = series.reach || [];
+  const followerSeries = series.follower_count || [];
+  const reachTotal = reachSeries.reduce((a, v) => a + (v.value || 0), 0);
+  const lastFollower = followerSeries.length ? followerSeries[followerSeries.length - 1].value : null;
+
+  const postsHtml = (d.posts || []).length > 0 ? `
+    <div class="posts-grid" style="margin-top:14px;">
+      ${d.posts.slice(0, 9).map(p => `
+        <div class="post-card">
+          <div class="pc-type">${p.mediaType}</div>
+          <div class="pc-cap">${p.caption || '<sem legenda>'}</div>
+          <div class="pc-mets">♥ ${fmt(p.likeCount)} · 💬 ${fmt(p.commentsCount)}${p.reach != null ? ' · 👁 ' + fmt(p.reach) : ''}${p.saved != null ? ' · 🔖 ' + fmt(p.saved) : ''}</div>
+        </div>`).join('')}
+    </div>` : '<div style="font-size:13px;color:var(--text2);margin-top:10px;">Nenhum post recente com Insights disponível ainda.</div>';
+
+  const warnings = [d.account_metrics_warning, d.media_warning].filter(Boolean);
+
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-title">Etapa 2 · Análise Profunda — @${d.igUsername}</div>
+      <div class="badges" style="margin-bottom:14px;">
+        <span class="source-tag">✦ Conectado via login oficial do Instagram</span>
+      </div>
+      <div class="mets">
+        <div class="met"><div class="v">${fmt(reachTotal)}</div><div class="l">Alcance (período)</div></div>
+        <div class="met"><div class="v">${lastFollower != null ? fmt(lastFollower) : '—'}</div><div class="l">Seguidores (interno)</div></div>
+        <div class="met"><div class="v">${d.posts ? d.posts.length : 0}</div><div class="l">Posts analisados</div></div>
+      </div>
+      <div class="card-title" style="margin-top:18px;">Performance por publicação</div>
+      ${postsHtml}
+      ${warnings.length ? `<div style="margin-top:14px;font-size:11.5px;color:var(--text3);">⚠ Algumas métricas não puderam ser obtidas: ${warnings.join(' · ')}</div>` : ''}
+      <button class="btn-s" style="margin-top:16px;width:100%;" onclick="disconnectInstagram()">Desconectar conta</button>
+    </div>
+    <div class="next-step-box">
+      <div class="ns-t">✅ Etapa 2 concluída. A Etapa 3 (Análise de Concorrência) entra em seguida.</div>
+      <button class="btn-locked" disabled>Etapa 3 — Análise de Concorrência (em construção)</button>
+    </div>
+  `;
+}
+
+async function disconnectInstagram() {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  document.getElementById('etapa2-area').innerHTML = '';
+  setStepperState(2);
+  const next = document.getElementById('result-inner');
+  if (next && !document.getElementById('etapa1-next-box')) {
+    // se o botão de conectar já tinha sido removido, recoloca
+    next.insertAdjacentHTML('beforeend', `
+      <div class="next-step-box" id="etapa1-next-box">
+        <div class="ns-t">Conta desconectada. Conecte novamente quando quiser ver a Etapa 2.</div>
+        <button class="btn-main" onclick="connectInstagram()">Conectar conta do Instagram →</button>
+      </div>`);
+  }
+}
+
+function renderFinalReport(r, p) {
+  document.getElementById('loading').style.display = 'none';
+  const clsMap = { 'Iniciante':'bb','Em crescimento':'bn','Intermediário':'bn','Avançado':'ba','Autoridade':'ba' };
+  const scMap = { posicionamento:'Posicionamento', engajamento:'Engajamento', consistencia:'Consistência', bio_e_identidade:'Bio & identidade', estrategia_de_conteudo:'Estratégia de conteúdo' };
+  const handle = p.username || '';
+  const init = handle.charAt(0).toUpperCase();
+  const sc = r.nota_geral;
+
+  calendarData = r.cronograma_30_dias || [];
+  currentCalDay = 1;
+
+  let html = `
+    <div class="profile-hero">
+      <div class="avatar">${init}</div>
+      <div class="pinfo">
+        <div class="handle">@${handle}</div>
+        <div class="sub">${p.niche || ''}</div>
+        <div class="badges">
+          <span class="badge ${clsMap[r.classificacao]||'bn'}">${r.classificacao}</span>
+          ${p.isVerified ? '<span class="badge ba">✓ Verificado</span>' : ''}
+          <span class="source-tag">✦ Dados verificados em tempo real via Instagram</span>
+        </div>
+      </div>
+      <div class="score-area">
+        <div class="score-big" style="color:${sc_color(sc)}">${sc}</div>
+        <div class="score-sub">Score OnFeX /100</div>
+      </div>
+    </div>
+
+    <div class="mets">
+      <div class="met"><div class="v">${p.followersCount ? fmt(p.followersCount) : '—'}</div><div class="l">Seguidores</div></div>
+      <div class="met"><div class="v">${p.engagementRate ? p.engagementRate+'%' : '—'}</div><div class="l">Engajamento</div></div>
+      <div class="met"><div class="v">${p.postsCount ? fmt(p.postsCount) : '—'}</div><div class="l">Posts</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Scores por dimensão</div>
+      <div class="score-rows">
+        ${Object.entries(scMap).map(([k,label]) => {
+          const v = (r.scores||{})[k]||0;
+          return `<div class="srow">
+            <div class="srow-h"><span class="srow-n">${label}</span><span class="srow-v" style="color:${sc_color(v)}">${v}/100</span></div>
+            <div class="bar-bg"><div class="bar-f" data-w="${v}" style="background:${sc_color(v)}"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Diagnóstico geral</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;">${r.diagnostico_geral}</div>
+    </div>
+
+    ${r.projecao_faturamento ? `
+    <div class="fat-box">
+      <div class="fat-label">Projeção de Potencial de Faturamento Mensal</div>
+      <div class="fat-range">${r.projecao_faturamento.potencial_mensal_min}<span class="sep">→</span>${r.projecao_faturamento.potencial_mensal_max}</div>
+      <div class="fat-just">${r.projecao_faturamento.justificativa}</div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="sw">
+        <div class="sw-b">
+          <div class="sw-t g">Pontos fortes</div>
+          ${(r.pontos_fortes||[]).map(p=>`<div class="sw-i"><div class="dot g"></div><span>${p}</span></div>`).join('')}
+        </div>
+        <div class="sw-b">
+          <div class="sw-t r">Pontos fracos</div>
+          ${(r.pontos_fracos||[]).map(p=>`<div class="sw-i"><div class="dot r"></div><span>${p}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Plano de execução</div>
+      ${(r.plano_execucao||[]).map((s,i)=>`
+        <div class="plan-i">
+          <div class="plan-n">${i+1}</div>
+          <div class="plan-c">
+            <div class="plan-h">
+              <span class="plan-title">${s.acao}</span>
+              <span class="pprio ${pclass(s.prioridade)}">${s.prioridade}</span>
+              <span class="plan-prazo">${s.prazo}</span>
+            </div>
+            <div class="plan-d">${s.descricao}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    ${r.bio_sugerida ? `<div class="card"><div class="card-title">Bio sugerida</div><div class="bio-box">${r.bio_sugerida}</div></div>` : ''}
+
+    <div class="summary">
+      <div class="st">Próximos 30 dias — resumo executivo</div>
+      <div class="sc">${r.proximos_30_dias}</div>
+    </div>
+
+    ${calendarData.length > 0 ? `
+    <div class="card">
+      <div class="card-title">Cronograma de conteúdo inteligente · 30 dias</div>
+      <div class="cal-tabs" id="cal-tabs">
+        ${calendarData.map(d => `<div class="cal-tab ${d.dia === 1 ? 'active' : ''}" data-day="${d.dia}" onclick="goToCalDay(${d.dia})">Dia ${d.dia}</div>`).join('')}
+      </div>
+      <div id="cal-content"></div>
+      <div class="cal-nav">
+        <button id="cal-prev" onclick="navCalDay(-1)" disabled>← Anterior</button>
+        <button id="cal-next" onclick="navCalDay(1)">Próximo →</button>
+      </div>
+    </div>` : ''}
+
+    ${r.referencias_virais && r.referencias_virais.length > 0 ? `
+    <div class="card">
+      <div class="card-title">Top 10 Referências do Segmento</div>
+      <div class="viral-grid">
+        ${r.referencias_virais.map((v,i) => `
+          <div class="viral-card">
+            <div class="viral-rank">${String(i+1).padStart(2,'0')}</div>
+            <div class="viral-handle">
+              <a href="https://instagram.com/${v.perfil.replace('@','')}" target="_blank" rel="noopener">${v.perfil.startsWith('@') ? v.perfil : '@'+v.perfil} ↗</a>
+            </div>
+            <div class="viral-tipo">${v.tipo_conteudo}</div>
+            <div class="viral-row">
+              <div>
+                <div class="viral-item-title">Por que funciona</div>
+                <div class="viral-item-text">${v.por_que_funciona}</div>
+              </div>
+              <div>
+                <div class="viral-item-title">Como adaptar</div>
+                <div class="viral-item-text">${v.o_que_adaptar}</div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+  `;
+
+  document.getElementById('result-inner').innerHTML = html;
+  document.getElementById('result').style.display = 'block';
+
+  if (calendarData.length > 0) renderCalDay(1);
+
+  setTimeout(() => document.querySelectorAll('.bar-f').forEach(el => { el.style.width = el.dataset.w + '%'; }), 150);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderCalDay(day) {
+  const d = calendarData.find(x => x.dia === day);
+  if (!d) return;
+  const el = document.getElementById('cal-content');
+  el.innerHTML = `
+    <div class="cal-feed">
+      <div class="cal-feed-label">📍 Feed do dia</div>
+      <span class="formato-tag">${d.feed.formato}</span>
+      <div class="cal-pauta">${d.feed.pauta}</div>
+      <div class="cal-hook">"${d.feed.hook}"</div>
+    </div>
+    <div class="cal-stories">
+      <div class="cal-stories-label">Stories (3x)</div>
+      ${(d.stories||[]).map((s,i) => `<div class="story-pill"><div class="story-num">${i+1}</div><span>${s}</span></div>`).join('')}
+    </div>
+  `;
+  document.querySelectorAll('.cal-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.day) === day));
+  document.getElementById('cal-prev').disabled = day <= 1;
+  document.getElementById('cal-next').disabled = day >= calendarData.length;
+
+  const activeTab = document.querySelector('.cal-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+}
+function goToCalDay(day) { currentCalDay = day; renderCalDay(day); }
+function navCalDay(delta) {
+  const next = currentCalDay + delta;
+  if (next >= 1 && next <= calendarData.length) { currentCalDay = next; renderCalDay(next); }
+}
+
+function exportPDF() {
+  const handle = document.getElementById('username')?.value?.replace('@','') || 'perfil';
+  const el = document.getElementById('result-inner');
+  const opt = {
+    margin: [10,12,10,12],
+    filename: `diagnostico-onfex-${handle}.pdf`,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, backgroundColor: '#060810', useCORS: true, windowWidth: el.scrollWidth },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+  html2pdf().set(opt).from(el).save();
+}
+
+function reset() {
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('etapa2-area').innerHTML = '';
+  setStepperState(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/analyze.js": {
+      "maxDuration": 280
+    },
+    "api/apify.js": {
+      "maxDuration": 280
+    }
+  }
+}
