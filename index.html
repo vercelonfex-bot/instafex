@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 <title>InstaFex</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%237B5CF5'/%3E%3Cstop offset='100%25' stop-color='%234ADEC8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%2307081A'/%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='none' stroke='url(%23g)' stroke-width='2.2'/%3E%3Crect x='8' y='18' width='3.5' height='8' rx='1' fill='url(%23g)'/%3E%3Crect x='13.5' y='14' width='3.5' height='12' rx='1' fill='url(%23g)'/%3E%3Crect x='19' y='10' width='3.5' height='16' rx='1' fill='url(%23g)'/%3E%3Ccircle cx='25' cy='7' r='1.8' fill='%234ADEC8'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%238B6CF8'/%3E%3Cstop offset='100%25' stop-color='%234ADEC8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='10' fill='%2307081A'/%3E%3Crect x='5' y='5' width='30' height='30' rx='7' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Ccircle cx='18' cy='18' r='9' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Cline x1='24.5' y1='24.5' x2='33' y2='33' stroke='url(%23g)' stroke-width='2.8' stroke-linecap='round'/%3E%3Crect x='12' y='19' width='3' height='5' rx='1' fill='url(%23g)'/%3E%3Crect x='16.5' y='15' width='3' height='9' rx='1' fill='url(%23g)'/%3E%3Crect x='21' y='12' width='3' height='12' rx='1' fill='url(%23g)'/%3E%3Ccircle cx='31' cy='9' r='2.2' fill='%234ADEC8'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,9 +44,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   overflow-y: auto; overflow-x: hidden;
 }
 .sidebar-logo {
-  padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
+  padding: 16px 14px 14px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
+.sidebar-logo-icon { width: 36px; height: 36px; flex-shrink: 0; display: block; }
 .sidebar-logo-name {
   font-family: var(--sans); font-size: 17px; font-weight: 800; letter-spacing: 0.18em;
   line-height: 1; text-transform: uppercase;
@@ -493,6 +494,23 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
+      <svg class="sidebar-logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="logo-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8B6CF8"/>
+            <stop offset="55%" stop-color="#6C8DF5"/>
+            <stop offset="100%" stop-color="#4ADEC8"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="10" fill="#0C0E20"/>
+        <rect x="5" y="5" width="30" height="30" rx="7" fill="none" stroke="url(#logo-g)" stroke-width="2.5"/>
+        <circle cx="18" cy="18" r="9" fill="none" stroke="url(#logo-g)" stroke-width="2.5"/>
+        <line x1="24.5" y1="24.5" x2="33" y2="33" stroke="url(#logo-g)" stroke-width="2.8" stroke-linecap="round"/>
+        <rect x="12" y="19" width="3" height="5" rx="1" fill="url(#logo-g)"/>
+        <rect x="16.5" y="15" width="3" height="9" rx="1" fill="url(#logo-g)"/>
+        <rect x="21" y="12" width="3" height="12" rx="1" fill="url(#logo-g)"/>
+        <circle cx="31" cy="9" r="2.2" fill="#4ADEC8"/>
+      </svg>
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-name">Insta<span class="accent">Fex</span></div>
       </div>
