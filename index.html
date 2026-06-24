@@ -583,22 +583,126 @@ function sc_color(v) { return v >= 70 ? 'var(--good)' : v >= 40 ? 'var(--warn)' 
 function pclass(p) { return p === 'Alta' ? 'ph' : (p === 'Media' || p === 'Média') ? 'pm' : 'pl'; }
 
 function calcEtapa1Score(p) {
+  const breakdown = [];
   let score = 0;
   const eng = parseFloat(p.engagementRate) || 0;
-  if (eng >= 6) score += 35; else if (eng >= 3) score += 28; else if (eng >= 1) score += 18; else if (eng >= 0.5) score += 10; else score += 3;
+  let eS = eng >= 6 ? 35 : eng >= 3 ? 28 : eng >= 1 ? 18 : eng >= 0.5 ? 10 : 3;
+  score += eS; breakdown.push({ label: 'Engajamento', pts: eS, max: 35 });
   const f = p.followersCount || 0;
-  if (f >= 100000) score += 20; else if (f >= 50000) score += 16; else if (f >= 10000) score += 12; else if (f >= 5000) score += 8; else if (f >= 1000) score += 5; else score += 2;
+  let fS = f >= 100000 ? 20 : f >= 50000 ? 16 : f >= 10000 ? 12 : f >= 5000 ? 8 : f >= 1000 ? 5 : 2;
+  score += fS; breakdown.push({ label: 'Audiência', pts: fS, max: 20 });
   const cad = p.cadenceDays;
-  if (!cad) score += 8; else if (cad <= 1) score += 20; else if (cad <= 2) score += 15; else if (cad <= 3) score += 10; else if (cad <= 7) score += 5; else score += 1;
-  if (p.biography && p.biography.length > 80) score += 6; else if (p.biography && p.biography.length > 20) score += 3;
-  if (p.externalUrl) score += 5;
-  if (p.isVerified) score += 4;
-  if ((p.highlightCount || 0) >= 8) score += 5; else if ((p.highlightCount || 0) >= 3) score += 3;
+  let cS = !cad ? 8 : cad <= 1 ? 20 : cad <= 2 ? 15 : cad <= 3 ? 10 : cad <= 7 ? 5 : 1;
+  score += cS; breakdown.push({ label: 'Consistência', pts: cS, max: 20 });
+  let pS = 0;
+  if (p.biography && p.biography.length > 80) pS += 6; else if (p.biography && p.biography.length > 20) pS += 3;
+  if (p.externalUrl) pS += 5;
+  if (p.isVerified) pS += 4;
+  if ((p.highlightCount || 0) >= 8) pS += 5; else if ((p.highlightCount || 0) >= 3) pS += 3;
   const pc = p.postsCount || 0;
-  if (pc >= 200) score += 5; else if (pc >= 50) score += 3; else if (pc >= 20) score += 1;
+  if (pc >= 200) pS += 5; else if (pc >= 50) pS += 3; else if (pc >= 20) pS += 1;
+  score += pS; breakdown.push({ label: 'Perfil & Conteúdo', pts: pS, max: 25 });
   const grade = score >= 85 ? 'A+' : score >= 75 ? 'A' : score >= 62 ? 'B' : score >= 48 ? 'C' : score >= 32 ? 'D' : 'F';
   const gradeColor = (grade === 'A+' || grade === 'A') ? '#4ADE9C' : grade === 'B' ? '#6FCBEC' : grade === 'C' ? '#F0B25C' : '#F0625C';
-  return { score, grade, gradeColor };
+  return { score, grade, gradeColor, breakdown };
+}
+
+function buildDiagnosticoHtml(p) {
+  const eng = parseFloat(p.engagementRate) || 0;
+  const colorMap = { good: 'var(--good)', ok: 'var(--cyan)', warn: 'var(--warn)', bad: 'var(--bad)' };
+  const items = [];
+
+  if (eng >= 5)      items.push({ label: 'Engajamento',           val: eng+'%',                          s: 'good', msg: 'Excelente — acima da média do mercado' });
+  else if (eng >= 3) items.push({ label: 'Engajamento',           val: eng+'%',                          s: 'ok',   msg: 'Bom — dentro do esperado para o nicho' });
+  else if (eng >= 1) items.push({ label: 'Engajamento',           val: eng+'%',                          s: 'warn', msg: 'Regular — há espaço para crescer' });
+  else               items.push({ label: 'Engajamento',           val: eng ? eng+'%' : 'N/D',            s: 'bad',  msg: 'Baixo — requer atenção imediata' });
+
+  const cad = p.cadenceDays;
+  if (!cad)            items.push({ label: 'Frequência de posts', val: 'N/D',                            s: 'warn', msg: 'Dados insuficientes' });
+  else if (cad <= 1.5) items.push({ label: 'Frequência de posts', val: `a cada ${cad}d`,                 s: 'good', msg: 'Excelente consistência de publicação' });
+  else if (cad <= 3)   items.push({ label: 'Frequência de posts', val: `a cada ${cad}d`,                 s: 'ok',   msg: 'Boa frequência' });
+  else if (cad <= 7)   items.push({ label: 'Frequência de posts', val: `a cada ${cad}d`,                 s: 'warn', msg: 'Abaixo do ideal — algoritmo penaliza' });
+  else                 items.push({ label: 'Frequência de posts', val: `a cada ${cad}d`,                 s: 'bad',  msg: 'Muito espaçado — risco de queda no alcance' });
+
+  const bioLen = (p.biography || '').length;
+  if (bioLen > 80)      items.push({ label: 'Biografia',          val: bioLen+' caracteres',             s: 'good', msg: 'Completa e descritiva' });
+  else if (bioLen > 20) items.push({ label: 'Biografia',          val: bioLen+' caracteres',             s: 'warn', msg: 'Pode ser mais detalhada' });
+  else                  items.push({ label: 'Biografia',          val: 'Muito curta ou vazia',           s: 'bad',  msg: 'Precisa ser otimizada urgentemente' });
+
+  if (p.externalUrl) items.push({ label: 'Link na bio', val: 'Configurado',       s: 'good', msg: 'Canal de conversão ativo' });
+  else               items.push({ label: 'Link na bio', val: 'Não configurado',   s: 'warn', msg: 'Oportunidade de conversão não aproveitada' });
+
+  const hl = p.highlightCount || 0;
+  if (hl >= 8)      items.push({ label: 'Destaques',  val: hl+' destaques',  s: 'good', msg: 'Portfólio de conteúdo completo' });
+  else if (hl >= 3) items.push({ label: 'Destaques',  val: hl+' destaques',  s: 'ok',   msg: 'Bom — pode ampliar a vitrine' });
+  else if (hl > 0)  items.push({ label: 'Destaques',  val: hl+' destaque',   s: 'warn', msg: 'Poucos destaques — vitrine limitada' });
+  else              items.push({ label: 'Destaques',  val: 'Nenhum',         s: 'bad',  msg: 'Sem vitrine de conteúdo fixo' });
+
+  const ratio = p.followingCount > 0 ? p.followersCount / p.followingCount : null;
+  if (ratio === null)   items.push({ label: 'Índice de autoridade', val: 'N/D',              s: 'warn', msg: '' });
+  else if (ratio >= 5)  items.push({ label: 'Índice de autoridade', val: ratio.toFixed(1)+':1', s: 'good', msg: 'Alta autoridade — muito mais seguidores do que seguidos' });
+  else if (ratio >= 2)  items.push({ label: 'Índice de autoridade', val: ratio.toFixed(1)+':1', s: 'ok',   msg: 'Boa proporção seguidores/seguindo' });
+  else if (ratio >= 1)  items.push({ label: 'Índice de autoridade', val: ratio.toFixed(1)+':1', s: 'warn', msg: 'Proporção equilibrada — pode melhorar' });
+  else                  items.push({ label: 'Índice de autoridade', val: ratio.toFixed(2)+':1', s: 'bad',  msg: 'Segue mais do que é seguido — alerta de credibilidade' });
+
+  if (p.isVerified) items.push({ label: 'Verificação', val: '✓ Verificada', s: 'good', msg: 'Credibilidade adicional junto à audiência' });
+
+  return `
+    <div class="card">
+      <div class="card-title">Diagnóstico de Saúde do Perfil</div>
+      ${items.map((item, i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;${i < items.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
+          <div style="width:8px;height:8px;border-radius:50%;background:${colorMap[item.s]};flex-shrink:0;box-shadow:0 0 6px ${colorMap[item.s]};"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);">${item.label}</div>
+            ${item.msg ? `<div style="font-size:11.5px;color:var(--text3);margin-top:1px;">${item.msg}</div>` : ''}
+          </div>
+          <div style="font-size:12px;color:${colorMap[item.s]};font-weight:600;flex-shrink:0;text-align:right;white-space:nowrap;">${item.val}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function buildPostsStatsHtml(p) {
+  const posts = p.postsDetailed || [];
+  if (!posts.length) return '';
+  const avgLikes    = Math.round(posts.reduce((a,v) => a+(v.likesCount||0), 0) / posts.length);
+  const avgComments = Math.round(posts.reduce((a,v) => a+(v.commentsCount||0), 0) / posts.length);
+  const types = {};
+  posts.forEach(post => {
+    const t = (post.type||'').toLowerCase().includes('reel') || (post.type||'').toLowerCase().includes('video') ? 'Reels / Vídeos'
+            : (post.type||'').toLowerCase().includes('sidecar') || (post.type||'').toLowerCase().includes('album') || (post.type||'').toLowerCase().includes('carousel') ? 'Carrosséis'
+            : 'Fotos';
+    types[t] = (types[t]||0)+1;
+  });
+  const typesHtml = Object.entries(types).sort((a,b) => b[1]-a[1]).map(([name, count]) => {
+    const pct = Math.round(count/posts.length*100);
+    return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:100px;flex-shrink:0;font-size:12px;color:var(--text2);">${name}</div>
+        <div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:var(--cyan);border-radius:3px;"></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);white-space:nowrap;width:70px;text-align:right;">${count} post${count!==1?'s':''} (${pct}%)</div>
+      </div>`;
+  }).join('');
+  const best = [...posts].sort((a,b) => (b.likesCount||0)-(a.likesCount||0))[0];
+  return `
+    <div class="card">
+      <div class="card-title">Estatísticas de Publicação</div>
+      <div class="insights-mets" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="ins-met"><div class="v">${fmt(avgLikes)}</div><div class="l">Curtidas/post</div></div>
+        <div class="ins-met"><div class="v">${fmt(avgComments)}</div><div class="l">Comentários/post</div></div>
+        <div class="ins-met"><div class="v">${posts.length}</div><div class="l">Posts analisados</div></div>
+      </div>
+      <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;">Distribuição por formato</div>
+      ${typesHtml}
+      ${best ? `
+      <div style="background:var(--bg3);border-radius:10px;padding:12px 14px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--good);margin-bottom:6px;">Publicação mais engajada</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.55;margin-bottom:6px;">${(best.caption||'Sem legenda').slice(0,100)}${(best.caption||'').length>100?'…':''}</div>
+        <div style="font-size:11.5px;color:var(--text3);">♥ ${fmt(best.likesCount)} &nbsp;·&nbsp; 💬 ${fmt(best.commentsCount)} &nbsp;·&nbsp; ${best.type}</div>
+      </div>` : ''}
+    </div>`;
 }
 
 function calcRevenue(followers, engRate) {
@@ -831,27 +935,30 @@ function renderEtapa1Result(p, pos, content) {
   const handle = p.username || '';
   const init = handle.charAt(0).toUpperCase();
   const picSrc = p.profilePicUrl ? `/api/proxy-pic?url=${encodeURIComponent(p.profilePicUrl)}` : '';
-  const { score, grade, gradeColor } = calcEtapa1Score(p);
+  const { score, grade, gradeColor, breakdown } = calcEtapa1Score(p);
   const rev = calcRevenue(p.followersCount || 0, p.engagementRate || 0);
 
-  const posts = p.postsDetailed || [];
-  const postsHtml = posts.length > 0 ? `
+  const scoreBreakdownHtml = `
     <div class="card">
-      <div class="card-title">Publicações recentes (${posts.length})</div>
-      <div class="posts-grid-thumb">
-        ${posts.slice(0, 9).map(post => `
-          <div class="post-thumb-card">
-            ${post.thumbnailUrl
-              ? `<img src="/api/proxy-pic?url=${encodeURIComponent(post.thumbnailUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-              : `<div class="post-no-thumb">${post.type || 'Post'}</div>`}
-            <div class="post-thumb-badge">${(post.type||'').includes('Video')||(post.type||'').includes('Reel') ? '▶' : '◻'} ${post.type}</div>
-            <div class="post-thumb-overlay">
-              ${post.caption ? `<div style="font-size:9px;color:rgba(255,255,255,.7);margin-bottom:3px;line-height:1.3;overflow:hidden;max-height:26px;">${post.caption.slice(0,50)}${post.caption.length>50?'…':''}</div>` : ''}
-              <div class="post-thumb-mets">♥ ${fmt(post.likesCount)} &nbsp;💬 ${fmt(post.commentsCount)}</div>
+      <div class="card-title">Detalhamento do Score</div>
+      <div class="score-rows">
+        ${breakdown.map(b => {
+          const pct = Math.round(b.pts / b.max * 100);
+          const c = sc_color(pct);
+          return `<div class="srow">
+            <div class="srow-h">
+              <span class="srow-n">${b.label}</span>
+              <span class="srow-v" style="color:${c}">${b.pts}<span style="color:var(--text3);font-weight:400;">/${b.max}</span></span>
             </div>
-          </div>`).join('')}
+            <div class="bar-bg"><div class="bar-f" data-w="${pct}" style="background:${c}"></div></div>
+          </div>`;
+        }).join('')}
       </div>
-    </div>` : '';
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:11px;color:var(--text3);">Score total</span>
+        <span style="font-family:var(--serif);font-size:16px;font-weight:600;color:${gradeColor};">${score}/100 · Nota ${grade}</span>
+      </div>
+    </div>`;
 
   const posHtml = pos ? `
     <div class="card">
@@ -920,7 +1027,9 @@ function renderEtapa1Result(p, pos, content) {
       ${p.externalUrl ? `<div style="margin-top:10px;font-size:13px;color:var(--text2);">🔗 <a href="${p.externalUrl}" target="_blank" rel="noopener" style="color:var(--cyan-bright);">${p.externalUrl}</a></div>` : ''}
     </div>` : ''}
 
-    ${postsHtml}
+    ${scoreBreakdownHtml}
+    ${buildDiagnosticoHtml(p)}
+    ${buildPostsStatsHtml(p)}
     ${hashHtml}
     ${posHtml}
 
@@ -937,6 +1046,7 @@ function renderEtapa1Result(p, pos, content) {
       <button class="btn-s" onclick="resetAll()">↩ Nova análise</button>
       <button class="btn-s" onclick="runColeta()">🔄 Recolher dados</button>
     </div>`;
+  setTimeout(() => document.querySelectorAll('.bar-f').forEach(el => { el.style.width = el.dataset.w + '%'; }), 150);
 }
 
 /* ────────────────── SEÇÃO 2 — ANÁLISE AVANÇADA ────────────────── */
