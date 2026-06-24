@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-<title>InstaFex — OnFeX Technology</title>
+<title>InstaFex</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0f1a'/%3E%3Ctext x='16' y='22' font-family='Georgia%2Cserif' font-size='17' font-weight='700' fill='%236FCBEC' text-anchor='middle'%3EFx%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #060810; --bg-deep: #03040a; --bg2: #0d0f1a; --bg3: #131726; --bg4: #1a1f33;
@@ -16,7 +17,7 @@
   --cyan: #6FCBEC; --cyan-bright: #9FE0F7; --cyan-dim: rgba(111,203,236,0.12);
   --good: #4ADE9C; --warn: #F0B25C; --bad: #F0625C;
   --r: 14px; --rsm: 10px;
-  --serif: 'Fraunces', serif; --sans: 'Inter', -apple-system, sans-serif;
+  --serif: 'Fraunces', serif; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
   --sidebar-w: 232px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,11 +48,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
 .sidebar-logo-name {
-  font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.5px;
+  font-family: var(--serif); font-size: 27px; font-weight: 600; letter-spacing: -1px;
   line-height: 1; color: var(--text);
 }
 .sidebar-logo-name .accent { color: var(--cyan-bright); font-style: italic; }
-.sidebar-logo-sub { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .09em; margin-top: 4px; }
 
 .sidebar-nav { padding: 8px 0; flex: 1; }
 .nav-group { margin-bottom: 2px; }
@@ -431,6 +431,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 /* ── ACTIONS BAR ── */
 .actions-bar { display:flex; gap:8px; margin-top:4px; padding-top:14px; border-top:1px solid var(--border); }
 
+/* ── RELATORIO ── */
+.rpt-checks { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.rpt-check {
+  display:flex; align-items:center; gap:14px;
+  background:var(--bg3); border:1px solid var(--border); border-radius:var(--rsm);
+  padding:14px 16px; cursor:pointer; transition:border-color .15s, background .15s;
+}
+.rpt-check:not(.rpt-disabled):hover { border-color:var(--border2); background:var(--bg4); }
+.rpt-check input[type=checkbox] { accent-color:var(--cyan); width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+.rpt-disabled { opacity:.45; cursor:not-allowed; }
+.rpt-disabled input { cursor:not-allowed; }
+.rpt-icon { font-size:20px; flex-shrink:0; }
+.rpt-label { flex:1; font-size:14px; font-weight:500; color:var(--text); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .insights-mets { grid-template-columns:repeat(2,1fr); }
@@ -479,39 +493,41 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <div class="sidebar-logo">
       <div class="sidebar-logo-text">
         <div class="sidebar-logo-name">Insta<span class="accent">Fex</span></div>
-        <div class="sidebar-logo-sub">OnFeX Technology®</div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
       <div class="nav-group">
         <div class="nav-group-label">Análise</div>
-        <button class="nav-item active" id="nav-coleta" onclick="navigateTo('coleta')">
+        <button class="nav-item active" id="nav-basica" onclick="navigateTo('basica')">
           <span class="nav-icon">📊</span>
-          <span class="ni-label">Coleta de Dados</span>
+          <span class="ni-label">Análise Básica</span>
           <span class="ni-badge">✓</span>
         </button>
-        <button class="nav-item" id="nav-analise" onclick="navigateTo('analise')">
+        <button class="nav-item" id="nav-avancada" onclick="navigateTo('avancada')">
           <span class="nav-icon">🔍</span>
-          <span class="ni-label">Análise Profunda</span>
+          <span class="ni-label">Análise Avançada</span>
           <span class="ni-badge">✓</span>
         </button>
         <button class="nav-item" id="nav-concorrencia" onclick="navigateTo('concorrencia')">
           <span class="nav-icon">🏆</span>
-          <span class="ni-label">Concorrência</span>
+          <span class="ni-label">Análise Concorrência</span>
           <span class="ni-badge">✓</span>
         </button>
       </div>
       <div class="nav-group">
-        <div class="nav-group-label">Estratégia</div>
-        <button class="nav-item" id="nav-planejamento" onclick="navigateTo('planejamento')">
+        <div class="nav-group-label">Planejamento Estratégico</div>
+        <button class="nav-item" id="nav-plano" onclick="navigateTo('plano')">
           <span class="nav-icon">📋</span>
-          <span class="ni-label">Planejamento</span>
+          <span class="ni-label">Plano de Ação</span>
           <span class="ni-badge">✓</span>
         </button>
-        <button class="nav-item" id="nav-entrega" onclick="navigateTo('entrega')">
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Funções</div>
+        <button class="nav-item" id="nav-relatorio" onclick="navigateTo('relatorio')">
           <span class="nav-icon">📄</span>
-          <span class="ni-label">Entrega Final</span>
+          <span class="ni-label">Relatório</span>
           <span class="ni-badge">✓</span>
         </button>
       </div>
@@ -519,7 +535,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
     <div class="sidebar-footer">
       <button class="sidebar-footer-btn" onclick="resetAll()">↩ Nova análise</button>
-      <button class="sidebar-footer-btn" onclick="exportPDF()">⬇ Exportar PDF</button>
     </div>
   </aside>
 
@@ -528,8 +543,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <header class="topbar">
       <button class="mob-menu-btn" onclick="openSidebar()">☰</button>
       <div class="topbar-info">
-        <div class="topbar-title" id="topbar-title">Coleta Inicial de Dados</div>
-        <div class="topbar-sub" id="topbar-sub">Reunir informações públicas para análise preliminar</div>
+        <div class="topbar-title" id="topbar-title">Análise Básica</div>
+        <div class="topbar-sub" id="topbar-sub">Levantamento público do perfil, métricas e posicionamento</div>
       </div>
       <div class="topbar-profile" id="topbar-profile" style="display:none;">
         <div class="topbar-avatar" id="topbar-avatar">?</div>
@@ -550,16 +565,16 @@ let etapa2Data = null;
 let etapa3Data = null;
 let finalReportData = null;
 let quizAnswers = null;
-let currentSection = 'coleta';
+let currentSection = 'basica';
 let loadMsgInterval, progressInterval;
 let currentCalDay = 1, calendarData = [];
 
 const SECTIONS = {
-  coleta:       { title: 'Coleta Inicial de Dados',      sub: 'Levantamento público do perfil, métricas e posicionamento' },
-  analise:      { title: 'Análise Profunda da Conta',    sub: 'Métricas internas via login oficial do Instagram' },
-  concorrencia: { title: 'Análise de Concorrência',      sub: 'Mapeamento de mercado e diferenciais competitivos' },
-  planejamento: { title: 'Planejamento Estratégico',     sub: 'Diagnóstico e criação do cronograma personalizado' },
-  entrega:      { title: 'Entrega Final',                sub: 'Documento estratégico completo gerado pela IA OnFeX' }
+  basica:       { title: 'Análise Básica',               sub: 'Levantamento público do perfil, métricas e posicionamento' },
+  avancada:     { title: 'Análise Avançada',             sub: 'Métricas internas via login oficial do Instagram' },
+  concorrencia: { title: 'Análise Concorrência',         sub: 'Mapeamento de mercado e diferenciais competitivos' },
+  plano:        { title: 'Plano de Ação',                sub: 'Diagnóstico estratégico e cronograma personalizado' },
+  relatorio:    { title: 'Relatório',                    sub: 'Gere e exporte seu relatório em PDF' }
 };
 
 /* ────────────────── UTILS ────────────────── */
@@ -621,11 +636,11 @@ function markDone(section) {
 function renderSection(section) {
   const content = document.getElementById('page-content');
   switch (section) {
-    case 'coleta':       renderColetaSection(content); break;
-    case 'analise':      renderAnaliseSection(content); break;
+    case 'basica':       renderBasicaSection(content); break;
+    case 'avancada':     renderAvancadaSection(content); break;
     case 'concorrencia': renderConcorrenciaSection(content); break;
-    case 'planejamento': renderPlanejamentoSection(content); break;
-    case 'entrega':      renderEntregaSection(content); break;
+    case 'plano':        renderPlanoSection(content); break;
+    case 'relatorio':    renderRelatorioSection(content); break;
   }
 }
 
@@ -717,18 +732,18 @@ function showErr(msg) {
   content.innerHTML = `
     <div class="card">
       <div class="err" style="display:block;">⚠ ${msg}</div>
-      <button class="btn-main" style="margin-top:12px;" onclick="navigateTo('coleta')">← Voltar para Coleta</button>
+      <button class="btn-main" style="margin-top:12px;" onclick="navigateTo('basica')">← Voltar para Análise Básica</button>
     </div>`;
 }
 
-/* ────────────────── SEÇÃO 1 — COLETA DE DADOS ────────────────── */
-function renderColetaSection(content) {
+/* ────────────────── SEÇÃO 1 — ANÁLISE BÁSICA ────────────────── */
+function renderBasicaSection(content) {
   if (etapa1Data) {
     renderEtapa1Result(etapa1Data.profile, etapa1Data.positioning, content);
   } else {
     content.innerHTML = `
       <div class="card">
-        <div class="card-title">Coleta Inicial de Dados</div>
+        <div class="card-title">Análise Básica</div>
         <p style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6;">Informe os dados abaixo para iniciar a análise completa do perfil Instagram.</p>
         <div class="field"><label>@ do Instagram</label><input type="text" id="username" placeholder="@nomedocliente" /></div>
         <div class="field"><label>Nicho do perfil</label><input type="text" id="niche" placeholder="Ex: Fitness, Gastronomia, Moda, Finanças..." /></div>
@@ -738,7 +753,7 @@ function renderColetaSection(content) {
 
       <div class="section-intro" style="margin-top:14px;">
         <div class="section-intro-icon">📊</div>
-        <div class="section-intro-title">O que será coletado</div>
+        <div class="section-intro-title">O que será analisado</div>
         <div class="section-intro-sub">Análise completa dos dados públicos disponíveis no Instagram.</div>
         <div class="section-checklist">
           <div class="section-checklist-item"><div class="sc-dot">1</div>Levantamento de dados do perfil</div>
@@ -777,7 +792,7 @@ async function runColeta() {
     profile = data;
   } catch (e) {
     finishLoading();
-    renderColetaSection(document.getElementById('page-content'));
+    renderBasicaSection(document.getElementById('page-content'));
     const errEl2 = document.getElementById('form-err');
     if (errEl2) {
       errEl2.textContent = '⚠ ' + (e.name === 'AbortError' ? 'Timeout ao buscar dados. Tente novamente.' : e.message);
@@ -805,7 +820,7 @@ async function runColeta() {
   etapa1Data = { profile, positioning };
   etapa3Data = null; quizAnswers = null; finalReportData = null;
   localStorage.setItem('instafex_etapa1', JSON.stringify(etapa1Data));
-  markDone('coleta');
+  markDone('basica');
   updateTopbarProfile(profile);
 
   renderEtapa1Result(profile, positioning, document.getElementById('page-content'));
@@ -910,11 +925,11 @@ function renderEtapa1Result(p, pos, content) {
     ${posHtml}
 
     <div class="next-step-box">
-      <div class="ns-t">✅ Coleta concluída — escolha a próxima análise:</div>
+      <div class="ns-t">✅ Análise Básica concluída — escolha a próxima etapa:</div>
       <div class="stage-jumps" style="margin-top:10px;">
-        <button class="sj-btn" onclick="navigateTo('analise')">🔍 Análise Profunda<br><span style="font-size:9.5px;opacity:.7;">Login Instagram</span></button>
+        <button class="sj-btn" onclick="navigateTo('avancada')">🔍 Análise Avançada<br><span style="font-size:9.5px;opacity:.7;">Login Instagram</span></button>
         <button class="sj-btn" onclick="navigateTo('concorrencia')">🏆 Concorrência<br><span style="font-size:9.5px;opacity:.7;">Benchmark de mercado</span></button>
-        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento<br><span style="font-size:9.5px;opacity:.7;">Quiz estratégico</span></button>
+        <button class="sj-btn" onclick="navigateTo('plano')">📋 Plano de Ação<br><span style="font-size:9.5px;opacity:.7;">Quiz estratégico</span></button>
       </div>
     </div>
 
@@ -924,15 +939,15 @@ function renderEtapa1Result(p, pos, content) {
     </div>`;
 }
 
-/* ────────────────── SEÇÃO 2 — ANÁLISE PROFUNDA ────────────────── */
-function renderAnaliseSection(content) {
+/* ────────────────── SEÇÃO 2 — ANÁLISE AVANÇADA ────────────────── */
+function renderAvancadaSection(content) {
   if (etapa2Data) {
     renderEtapa2Result(etapa2Data, content);
   } else {
     content.innerHTML = `
       <div class="section-intro">
         <div class="section-intro-icon">🔍</div>
-        <div class="section-intro-title">Análise Profunda da Conta</div>
+        <div class="section-intro-title">Análise Avançada</div>
         <div class="section-intro-sub">Conecte sua conta do Instagram para acessar métricas internas e receber uma análise estratégica completa com inteligência artificial.</div>
         <div class="section-checklist">
           <div class="section-checklist-item"><div class="sc-dot">✓</div>Login seguro via Instagram Official API</div>
@@ -942,7 +957,7 @@ function renderAnaliseSection(content) {
         </div>
         <button class="btn-main" style="max-width:340px;" onclick="connectInstagram()">Conectar conta do Instagram →</button>
         <div style="margin-top:10px;">
-          <button class="btn-s" style="max-width:220px;display:inline-block;" onclick="navigateTo('concorrencia')">Pular para Concorrência →</button>
+          <button class="btn-s" style="max-width:220px;display:inline-block;" onclick="navigateTo('concorrencia')">Pular para Análise Concorrência →</button>
         </div>
       </div>`;
   }
@@ -960,8 +975,8 @@ async function maybeAutoLoadEtapa2() {
 
 async function loadEtapa2Insights() {
   const content = document.getElementById('page-content');
-  if (currentSection !== 'analise') {
-    markDone('analise');
+  if (currentSection !== 'avancada') {
+    markDone('avancada');
     return;
   }
   content.innerHTML = `<div class="card"><div class="card-title">Análise Profunda da Conta</div><div class="inline-load"><div class="inline-spinner"></div><span>Carregando métricas internas da conta conectada...</span></div></div>`;
@@ -971,7 +986,7 @@ async function loadEtapa2Insights() {
     const data = await r.json();
     if (!r.ok || data.error) throw new Error(data.error || 'Erro ao buscar Insights.');
     etapa2Data = data;
-    markDone('analise');
+    markDone('avancada');
     renderEtapa2Result(data, content);
   } catch (e) {
     content.innerHTML = `
@@ -1072,7 +1087,7 @@ function renderEtapa2Result(d, content) {
       <div class="ns-t">✅ Análise Profunda concluída — continue a jornada:</div>
       <div class="stage-jumps" style="margin-top:10px;">
         <button class="sj-btn" onclick="navigateTo('concorrencia')">🏆 Concorrência</button>
-        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento</button>
+        <button class="sj-btn" onclick="navigateTo('plano')">📋 Plano de Ação</button>
       </div>
     </div>`;
 
@@ -1196,8 +1211,8 @@ function renderInsightsAnalysisHtml(analysis, analysisError) {
 async function disconnectInstagram() {
   await fetch('/api/auth/logout', { method: 'POST' });
   etapa2Data = null;
-  document.getElementById('nav-analise').classList.remove('done');
-  renderAnaliseSection(document.getElementById('page-content'));
+  document.getElementById('nav-avancada').classList.remove('done');
+  renderAvancadaSection(document.getElementById('page-content'));
 }
 
 /* ────────────────── SEÇÃO 3 — CONCORRÊNCIA ────────────────── */
@@ -1211,8 +1226,8 @@ function renderConcorrenciaSection(content) {
       <div class="section-intro">
         <div class="section-intro-icon">🏆</div>
         <div class="section-intro-title">Análise de Concorrência</div>
-        <div class="section-intro-sub">Para mapear os concorrentes, primeiro complete a Coleta Inicial de Dados do perfil.</div>
-        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('coleta')">← Ir para Coleta de Dados</button>
+        <div class="section-intro-sub">Para mapear os concorrentes, primeiro complete a Análise Básica do perfil.</div>
+        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('basica')">← Ir para Análise Básica</button>
       </div>`;
     return;
   }
@@ -1232,7 +1247,7 @@ function renderConcorrenciaSection(content) {
 }
 
 async function runConcorrencia() {
-  if (!etapa1Data?.profile) { navigateTo('coleta'); return; }
+  if (!etapa1Data?.profile) { navigateTo('basica'); return; }
   const profile = etapa1Data.profile;
   const content = document.getElementById('page-content');
   content.innerHTML = `
@@ -1305,34 +1320,25 @@ function renderEtapa3Result(d, profile, content) {
     <div class="next-step-box">
       <div class="ns-t">✅ Concorrência mapeada — avance para o planejamento:</div>
       <div class="stage-jumps" style="margin-top:10px;">
-        <button class="sj-btn" onclick="navigateTo('planejamento')">📋 Planejamento Estratégico →</button>
+        <button class="sj-btn" onclick="navigateTo('plano')">📋 Plano de Ação →</button>
       </div>
     </div>`;
 }
 
-/* ────────────────── SEÇÃO 4 — PLANEJAMENTO ────────────────── */
-function renderPlanejamentoSection(content) {
+/* ────────────────── SEÇÃO 4 — PLANO DE AÇÃO ────────────────── */
+function renderPlanoSection(content) {
   if (!etapa1Data) {
     content.innerHTML = `
       <div class="section-intro">
         <div class="section-intro-icon">📋</div>
-        <div class="section-intro-title">Planejamento Estratégico</div>
-        <div class="section-intro-sub">Complete primeiro a Coleta de Dados para iniciar o diagnóstico estratégico.</div>
-        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('coleta')">← Ir para Coleta de Dados</button>
+        <div class="section-intro-title">Plano de Ação</div>
+        <div class="section-intro-sub">Complete primeiro a Análise Básica para iniciar o diagnóstico estratégico.</div>
+        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('basica')">← Ir para Análise Básica</button>
       </div>`;
     return;
   }
   if (finalReportData) {
-    content.innerHTML = `
-      <div class="card" style="text-align:center;padding:30px;">
-        <div style="font-size:36px;margin-bottom:10px;">✅</div>
-        <div style="font-size:16px;font-weight:600;color:var(--good);margin-bottom:8px;">Planejamento gerado com sucesso!</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">O relatório completo está disponível em Entrega Final.</div>
-        <div class="stage-jumps" style="justify-content:center;">
-          <button class="sj-btn" onclick="navigateTo('entrega')">📄 Ver Entrega Final →</button>
-          <button class="sj-btn" onclick="resetQuiz()">🔄 Refazer planejamento</button>
-        </div>
-      </div>`;
+    renderFinalReport(finalReportData, etapa1Data?.profile || {}, content);
     return;
   }
   renderQuizForm(content);
@@ -1341,8 +1347,8 @@ function renderPlanejamentoSection(content) {
 function resetQuiz() {
   finalReportData = null;
   quizAnswers = null;
-  document.getElementById('nav-entrega').classList.remove('done');
-  renderPlanejamentoSection(document.getElementById('page-content'));
+  document.getElementById('nav-plano').classList.remove('done');
+  renderPlanoSection(document.getElementById('page-content'));
 }
 
 function renderQuizForm(content) {
@@ -1419,7 +1425,7 @@ async function submitPlanejamento() {
   const content = document.getElementById('page-content');
   content.innerHTML = `
     <div class="card">
-      <div class="card-title">Gerando Planejamento Estratégico</div>
+      <div class="card-title">Gerando Plano de Ação</div>
       <div class="inline-load"><div class="inline-spinner"></div><span>Criando planejamento personalizado com IA OnFeX… (pode levar até 3 minutos)</span></div>
     </div>`;
 
@@ -1433,33 +1439,18 @@ async function submitPlanejamento() {
     const data = await r.json();
     if (!r.ok || data.error) throw new Error(data.error || 'Erro ao gerar planejamento.');
     finalReportData = data;
-    markDone('planejamento');
-    markDone('entrega');
-    navigateTo('entrega');
+    markDone('plano');
+    navigateTo('plano');
   } catch (e) {
     content.innerHTML = `
       <div class="card">
-        <div class="card-title">Planejamento Estratégico</div>
+        <div class="card-title">Plano de Ação</div>
         <div class="err" style="display:block;">⚠ ${e.message}</div>
         <button class="btn-main" style="margin-top:12px;" onclick="submitPlanejamento()">Tentar novamente</button>
       </div>`;
   }
 }
 
-/* ────────────────── SEÇÃO 5 — ENTREGA FINAL ────────────────── */
-function renderEntregaSection(content) {
-  if (!finalReportData) {
-    content.innerHTML = `
-      <div class="section-intro">
-        <div class="section-intro-icon">📄</div>
-        <div class="section-intro-title">Entrega Final</div>
-        <div class="section-intro-sub">Complete o Planejamento Estratégico para gerar o documento final com cronograma, recomendações e plano de ação.</div>
-        <button class="btn-main" style="max-width:280px;" onclick="navigateTo('planejamento')">← Ir para Planejamento</button>
-      </div>`;
-    return;
-  }
-  renderFinalReport(finalReportData, etapa1Data?.profile || {}, content);
-}
 
 function renderFinalReport(r, p, content) {
   const clsMap = { 'Iniciante':'bb','Em crescimento':'bn','Intermediário':'bn','Avançado':'ba','Autoridade':'ba' };
@@ -1595,7 +1586,8 @@ function renderFinalReport(r, p, content) {
 
     <div class="actions-bar">
       <button class="btn-s" onclick="resetAll()">↩ Nova análise</button>
-      <button class="btn-s p" onclick="exportPDF()">⬇ Exportar PDF</button>
+      <button class="btn-s" onclick="resetQuiz()">🔄 Refazer planejamento</button>
+      <button class="btn-s p" onclick="navigateTo('relatorio')">📄 Gerar Relatório PDF</button>
     </div>`;
 
   if (calendarData.length > 0) renderCalDay(1);
@@ -1625,7 +1617,109 @@ function renderCalDay(day) {
 function goToCalDay(day) { currentCalDay = day; renderCalDay(day); }
 function navCalDay(delta) { const n = currentCalDay + delta; if (n >= 1 && n <= calendarData.length) { currentCalDay = n; renderCalDay(n); } }
 
-/* ────────────────── PDF EXPORT ────────────────── */
+/* ────────────────── SEÇÃO 5 — RELATÓRIO ────────────────── */
+function renderRelatorioSection(content) {
+  const secs = [
+    { key: 'basica',       label: 'Análise Básica',        icon: '📊', check: () => !!etapa1Data },
+    { key: 'avancada',     label: 'Análise Avançada',      icon: '🔍', check: () => !!etapa2Data },
+    { key: 'concorrencia', label: 'Análise Concorrência',  icon: '🏆', check: () => !!etapa3Data },
+    { key: 'plano',        label: 'Plano de Ação',         icon: '📋', check: () => !!finalReportData },
+  ];
+  const anyDone = secs.some(s => s.check());
+
+  const checksHtml = secs.map(s => {
+    const done = s.check();
+    return `
+      <label class="rpt-check${done ? '' : ' rpt-disabled'}">
+        <input type="checkbox" name="rpt" value="${s.key}" ${done ? 'checked' : 'disabled'}>
+        <span class="rpt-icon">${s.icon}</span>
+        <span class="rpt-label">${s.label}</span>
+        ${done
+          ? '<span class="badge ba">✓ Concluído</span>'
+          : '<span style="font-size:10px;color:var(--text3);font-weight:500;">Pendente</span>'}
+      </label>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-title">Gerar Relatório PDF</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6;">
+        Selecione as seções concluídas para incluir no relatório. Seções pendentes não podem ser selecionadas.
+      </p>
+      <div class="rpt-checks">${checksHtml}</div>
+      ${anyDone
+        ? `<button class="btn-main" onclick="generateReport()">⬇ Gerar e Exportar PDF</button>`
+        : `<p style="font-size:13px;color:var(--text3);text-align:center;margin-top:4px;">Complete pelo menos uma seção para gerar o relatório.</p>`}
+    </div>
+
+    ${!anyDone ? `
+    <div class="section-intro" style="margin-top:14px;">
+      <div class="section-intro-icon">📄</div>
+      <div class="section-intro-title">Como funciona o Relatório</div>
+      <div class="section-intro-sub">Complete as análises no menu lateral, depois volte aqui para montar e exportar seu relatório personalizado em PDF.</div>
+      <button class="btn-main" style="max-width:260px;" onclick="navigateTo('basica')">Iniciar Análise Básica →</button>
+    </div>` : ''}`;
+}
+
+async function generateReport() {
+  const checked = [...document.querySelectorAll('input[name="rpt"]:checked')].map(i => i.value);
+  if (!checked.length) { alert('Selecione pelo menos uma seção para incluir no relatório.'); return; }
+
+  const content = document.getElementById('page-content');
+  content.innerHTML = `<div class="loading-wrap"><div class="lmsg">Preparando relatório...</div><div class="lsub">Aguarde um momento</div></div>`;
+
+  await new Promise(r => setTimeout(r, 80));
+
+  const handle = (etapa1Data?.profile?.username || 'relatorio').replace('@', '');
+  const date = new Date().toLocaleDateString('pt-BR');
+
+  let html = `
+    <div style="padding:12px 0 24px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div style="font-family:var(--serif);font-size:30px;font-weight:600;color:var(--text);letter-spacing:-1px;">Insta<span style="color:var(--cyan-bright);font-style:italic;">Fex</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;letter-spacing:.09em;text-transform:uppercase;">Relatório Estratégico · OnFeX Technology</div>
+      ${etapa1Data?.profile ? `<div style="font-size:13px;color:var(--text2);margin-top:8px;">@${etapa1Data.profile.username} · ${date}</div>` : ''}
+    </div>`;
+
+  const tempDiv = document.createElement('div');
+
+  if (checked.includes('basica') && etapa1Data) {
+    renderEtapa1Result(etapa1Data.profile, etapa1Data.positioning, tempDiv);
+    html += `<div style="margin-bottom:24px;"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:10px;">ANÁLISE BÁSICA</div>${tempDiv.innerHTML}</div>`;
+  }
+  if (checked.includes('avancada') && etapa2Data) {
+    renderEtapa2Result(etapa2Data, tempDiv);
+    html += `<div style="margin-bottom:24px;"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:10px;">ANÁLISE AVANÇADA</div>${tempDiv.innerHTML}</div>`;
+  }
+  if (checked.includes('concorrencia') && etapa3Data) {
+    renderEtapa3Result(etapa3Data, etapa1Data?.profile, tempDiv);
+    html += `<div style="margin-bottom:24px;"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:10px;">ANÁLISE CONCORRÊNCIA</div>${tempDiv.innerHTML}</div>`;
+  }
+  if (checked.includes('plano') && finalReportData) {
+    renderFinalReport(finalReportData, etapa1Data?.profile || {}, tempDiv);
+    html += `<div style="margin-bottom:24px;"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:10px;">PLANO DE AÇÃO</div>${tempDiv.innerHTML}</div>`;
+  }
+
+  content.innerHTML = html;
+
+  // Trigger bar animations immediately for PDF
+  document.querySelectorAll('.bar-f').forEach(el => { el.style.width = el.dataset.w + '%'; });
+  // Render calendar day 1 if present
+  if (calendarData.length > 0) { try { renderCalDay(1); } catch {} }
+
+  await new Promise(r => setTimeout(r, 200));
+
+  const opt = {
+    margin: [10, 12, 10, 12],
+    filename: `relatorio-instafex-${handle}.pdf`,
+    image: { type: 'jpeg', quality: 0.92 },
+    html2canvas: { scale: 2, backgroundColor: '#060810', useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+  html2pdf().set(opt).from(content).save().then(() => { navigateTo('relatorio'); });
+}
+
+/* ────────────────── PDF EXPORT (legado) ────────────────── */
 function exportPDF() {
   const handle = (etapa1Data?.profile?.username || 'perfil').replace('@','');
   const el = document.getElementById('page-content');
@@ -1654,7 +1748,7 @@ function resetAll() {
   document.getElementById('topbar-profile').style.display = 'none';
   document.getElementById('topbar-avatar').textContent = '?';
   document.getElementById('topbar-avatar').querySelectorAll('img').forEach(i => i.remove());
-  navigateTo('coleta');
+  navigateTo('basica');
 }
 
 /* ────────────────── OAUTH RETURN ────────────────── */
@@ -1667,27 +1761,27 @@ window.addEventListener('DOMContentLoaded', () => {
   if (saved) {
     try {
       etapa1Data = JSON.parse(saved);
-      markDone('coleta');
+      markDone('basica');
       updateTopbarProfile(etapa1Data.profile);
     } catch {}
   }
 
   if (conectado) {
     history.replaceState(null, '', window.location.pathname);
-    navigateTo('analise');
+    navigateTo('avancada');
     loadEtapa2Insights();
   } else if (erro) {
     history.replaceState(null, '', window.location.pathname);
-    navigateTo('analise');
+    navigateTo('avancada');
     const content = document.getElementById('page-content');
     content.innerHTML = `
       <div class="card">
-        <div class="card-title">Análise Profunda da Conta</div>
+        <div class="card-title">Análise Avançada</div>
         <div class="err" style="display:block;">⚠ ${decodeURIComponent(erro)}</div>
         <button class="btn-main" style="margin-top:12px;" onclick="connectInstagram()">Tentar conectar novamente</button>
       </div>`;
   } else {
-    navigateTo('coleta');
+    navigateTo('basica');
   }
 });
 </script>
