@@ -4,18 +4,18 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 <title>InstaFex</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0f1a'/%3E%3Ctext x='16' y='22' font-family='Georgia%2Cserif' font-size='17' font-weight='700' fill='%236FCBEC' text-anchor='middle'%3EFx%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%237B5CF5'/%3E%3Cstop offset='100%25' stop-color='%234ADEC8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%2307081A'/%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='none' stroke='url(%23g)' stroke-width='2.2'/%3E%3Crect x='8' y='18' width='3.5' height='8' rx='1' fill='url(%23g)'/%3E%3Crect x='13.5' y='14' width='3.5' height='12' rx='1' fill='url(%23g)'/%3E%3Crect x='19' y='10' width='3.5' height='16' rx='1' fill='url(%23g)'/%3E%3Ccircle cx='25' cy='7' r='1.8' fill='%234ADEC8'/%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #060810; --bg-deep: #03040a; --bg2: #0d0f1a; --bg3: #131726; --bg4: #1a1f33;
-  --border: rgba(125,211,240,0.10); --border2: rgba(125,211,240,0.22);
+  --bg: #07081A; --bg-deep: #04050F; --bg2: #0C0E20; --bg3: #111428; --bg4: #181C32;
+  --border: rgba(108,141,245,0.12); --border2: rgba(108,141,245,0.26);
   --text: #F5F5F0; --text2: #9CA3B8; --text3: #5C6378;
-  --cyan: #6FCBEC; --cyan-bright: #9FE0F7; --cyan-dim: rgba(111,203,236,0.12);
-  --good: #4ADE9C; --warn: #F0B25C; --bad: #F0625C;
+  --cyan: #6C8DF5; --cyan-bright: #9BAEFF; --cyan-dim: rgba(108,141,245,0.12);
+  --good: #4ADEC8; --warn: #F0B25C; --bad: #F0625C;
   --r: 14px; --rsm: 10px;
   --serif: 'Fraunces', serif; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
   --sidebar-w: 232px;
@@ -27,7 +27,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 /* ── GRID WATERMARK ── */
 .grid-watermark {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image: linear-gradient(rgba(111,203,236,0.022) 1px,transparent 1px), linear-gradient(90deg,rgba(111,203,236,0.022) 1px,transparent 1px);
+  background-image: linear-gradient(rgba(108,141,245,0.025) 1px,transparent 1px), linear-gradient(90deg,rgba(108,141,245,0.025) 1px,transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse 70% 50% at 50% 0%,black 0%,transparent 70%);
 }
@@ -49,9 +49,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 }
 .sidebar-logo-name {
   font-family: var(--sans); font-size: 17px; font-weight: 800; letter-spacing: 0.18em;
-  line-height: 1; color: var(--text); text-transform: uppercase;
+  line-height: 1; text-transform: uppercase;
+  background: linear-gradient(135deg, #9BAEFF 0%, #6C8DF5 50%, #4ADEC8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.sidebar-logo-name .accent { color: var(--text2); font-style: normal; }
 
 .sidebar-nav { padding: 8px 0; flex: 1; }
 .nav-group { margin-bottom: 2px; }
@@ -209,7 +211,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 }
 .profile-hero::after {
   content:''; position:absolute; top:-50%; right:-20%; width:260px; height:260px;
-  background:radial-gradient(circle,rgba(111,203,236,.07),transparent 70%); pointer-events:none;
+  background:radial-gradient(circle,rgba(108,141,245,.07),transparent 70%); pointer-events:none;
 }
 .avatar {
   width:58px; height:58px; border-radius:50%; flex-shrink:0;
@@ -223,10 +225,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .pinfo .sub { font-size:12.5px; color:var(--text2); margin-top:2px; }
 .pinfo .badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
 .badge { padding:3px 9px; border-radius:7px; font-size:10.5px; font-weight:600; }
-.ba { background:rgba(74,222,156,.12); color:var(--good); }
+.ba { background:rgba(74,222,200,.12); color:var(--good); }
 .bb { background:rgba(240,178,92,.12); color:var(--warn); }
 .bn { background:var(--cyan-dim); color:var(--cyan-bright); }
-.source-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(74,222,156,.08); border:1px solid rgba(74,222,156,.18); color:var(--good); border-radius:7px; padding:3px 9px; font-size:10.5px; font-weight:600; }
+.source-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(74,222,200,.08); border:1px solid rgba(74,222,200,.18); color:var(--good); border-radius:7px; padding:3px 9px; font-size:10.5px; font-weight:600; }
 
 /* ── SCORE BADGE ── */
 .score-badge {
@@ -246,7 +248,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .met .l { font-size:10px; color:var(--text3); margin-top:4px; letter-spacing:.04em; text-transform:uppercase; }
 
 /* ── REVENUE CARD ── */
-.revenue-card { background:linear-gradient(135deg,rgba(74,222,156,.07),var(--bg2)) !important; border-color:rgba(74,222,156,.22) !important; }
+.revenue-card { background:linear-gradient(135deg,rgba(74,222,200,.07),var(--bg2)) !important; border-color:rgba(74,222,200,.22) !important; }
 .revenue-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
 .rev-box { background:var(--bg3); border-radius:10px; padding:14px; }
 .rev-v { font-size:17px; font-weight:700; color:var(--good); line-height:1.2; }
@@ -336,8 +338,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .bench-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:4px; }
 .bench-value { font-size:13.5px; color:var(--text); font-weight:500; }
 .opp-list { display:flex; flex-direction:column; gap:8px; }
-.opp-i { display:flex; gap:10px; align-items:flex-start; background:rgba(74,222,156,.05); border:1px solid rgba(74,222,156,.15); border-radius:var(--rsm); padding:12px 14px; font-size:13px; color:var(--text2); }
-.opp-num { width:20px; height:20px; border-radius:50%; background:rgba(74,222,156,.15); color:var(--good); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.opp-i { display:flex; gap:10px; align-items:flex-start; background:rgba(74,222,200,.05); border:1px solid rgba(74,222,200,.15); border-radius:var(--rsm); padding:12px 14px; font-size:13px; color:var(--text2); }
+.opp-num { width:20px; height:20px; border-radius:50%; background:rgba(74,222,200,.15); color:var(--good); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
 /* ── QUIZ ── */
 .quiz-q { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
@@ -364,7 +366,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .srow-v { font-weight:600; font-family:var(--serif); }
 .bar-bg { background:var(--bg4); border-radius:3px; height:5px; overflow:hidden; }
 .bar-f { height:5px; border-radius:3px; transition:width 1.2s cubic-bezier(.16,1,.3,1); width:0; background:var(--cyan); }
-.fat-box { background:linear-gradient(135deg,rgba(74,222,156,.06),rgba(111,203,236,.06)); border:1px solid rgba(74,222,156,.18); border-radius:var(--r); padding:22px; margin-bottom:14px; }
+.fat-box { background:linear-gradient(135deg,rgba(74,222,200,.06),rgba(108,141,245,.06)); border:1px solid rgba(74,222,200,.18); border-radius:var(--r); padding:22px; margin-bottom:14px; }
 .fat-label { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--good); margin-bottom:10px; }
 .fat-range { font-family:var(--serif); font-size:30px; font-weight:600; color:var(--text); margin-bottom:10px; }
 .fat-range .sep { color:var(--text3); font-size:20px; margin:0 8px; }
@@ -385,10 +387,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .pprio { padding:2px 8px; border-radius:7px; font-size:10.5px; font-weight:600; }
 .ph { background:rgba(240,98,92,.1); color:var(--bad); }
 .pm { background:rgba(240,178,92,.1); color:var(--warn); }
-.pl { background:rgba(74,222,156,.1); color:var(--good); }
+.pl { background:rgba(74,222,200,.1); color:var(--good); }
 .plan-prazo { font-size:11px; color:var(--text3); margin-left:auto; }
 .plan-d { font-size:13px; color:var(--text2); line-height:1.6; }
-.summary { background:linear-gradient(135deg,var(--cyan-dim),rgba(111,203,236,.02)); border:1px solid var(--border2); border-radius:var(--r); padding:22px; margin-bottom:14px; }
+.summary { background:linear-gradient(135deg,var(--cyan-dim),rgba(108,141,245,.02)); border:1px solid var(--border2); border-radius:var(--r); padding:22px; margin-bottom:14px; }
 .summary .st { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--cyan-bright); margin-bottom:10px; }
 .summary .sc { font-size:14px; color:var(--text2); line-height:1.8; }
 
@@ -423,7 +425,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .viral-item-text { font-size:12px; color:var(--text2); line-height:1.5; }
 
 /* ── ENTREGA HEADER ── */
-.entrega-header { background:linear-gradient(135deg,var(--cyan-dim),rgba(74,222,156,.05)); border:1px solid var(--border2); border-radius:var(--r); padding:18px 22px; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+.entrega-header { background:linear-gradient(135deg,var(--cyan-dim),rgba(74,222,200,.05)); border:1px solid var(--border2); border-radius:var(--r); padding:18px 22px; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
 .entrega-badge { background:var(--good); color:var(--bg-deep); border-radius:var(--rsm); padding:4px 10px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; flex-shrink:0; }
 .entrega-title { font-family:var(--serif); font-size:17px; font-weight:600; }
 .entrega-sub { font-size:11.5px; color:var(--text2); margin-top:2px; }
@@ -603,7 +605,7 @@ function calcEtapa1Score(p) {
   if (pc >= 200) pS += 5; else if (pc >= 50) pS += 3; else if (pc >= 20) pS += 1;
   score += pS; breakdown.push({ label: 'Perfil & Conteúdo', pts: pS, max: 25 });
   const grade = score >= 85 ? 'A+' : score >= 75 ? 'A' : score >= 62 ? 'B' : score >= 48 ? 'C' : score >= 32 ? 'D' : 'F';
-  const gradeColor = (grade === 'A+' || grade === 'A') ? '#4ADE9C' : grade === 'B' ? '#6FCBEC' : grade === 'C' ? '#F0B25C' : '#F0625C';
+  const gradeColor = (grade === 'A+' || grade === 'A') ? '#4ADEC8' : grade === 'B' ? '#6C8DF5' : grade === 'C' ? '#F0B25C' : '#F0625C';
   return { score, grade, gradeColor, breakdown };
 }
 
@@ -1205,7 +1207,7 @@ function renderEtapa2Result(d, content) {
 }
 
 function initEtapa2Charts(d) {
-  const GRID_COLOR = 'rgba(125,211,240,0.06)';
+  const GRID_COLOR = 'rgba(108,141,245,0.06)';
   const TICK_COLOR = '#5C6378';
   const chartDefaults = {
     plugins: { legend: { labels: { color: '#9CA3B8', font: { size: 11, family: 'Inter' }, padding: 14, boxWidth: 10 } } },
@@ -1229,8 +1231,8 @@ function initEtapa2Charts(d) {
       data: {
         labels,
         datasets: [
-          { label: 'Alcance', data: reachSeries.map(v => v.value||0), borderColor: '#6FCBEC', backgroundColor: 'rgba(111,203,236,0.12)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 },
-          { label: 'Interações', data: intSeries.map(v => v.value||0), borderColor: '#4ADE9C', backgroundColor: 'rgba(74,222,156,0.10)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 }
+          { label: 'Alcance', data: reachSeries.map(v => v.value||0), borderColor: '#6C8DF5', backgroundColor: 'rgba(108,141,245,0.12)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 },
+          { label: 'Interações', data: intSeries.map(v => v.value||0), borderColor: '#4ADEC8', backgroundColor: 'rgba(74,222,200,0.10)', tension: 0.4, fill: true, pointRadius: 2, borderWidth: 2 }
         ]
       },
       options: { responsive: true, maintainAspectRatio: false, ...chartDefaults }
@@ -1245,7 +1247,7 @@ function initEtapa2Charts(d) {
       type: 'doughnut',
       data: {
         labels: Object.keys(typeCount),
-        datasets: [{ data: Object.values(typeCount), backgroundColor: ['#6FCBEC','#4ADE9C','#F0B25C','#F0625C','#A78BFA'], borderWidth: 0, hoverOffset: 6 }]
+        datasets: [{ data: Object.values(typeCount), backgroundColor: ['#6C8DF5','#4ADEC8','#F0B25C','#F0625C','#A78BFA'], borderWidth: 0, hoverOffset: 6 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -1264,8 +1266,8 @@ function initEtapa2Charts(d) {
       data: {
         labels: topPosts.map((_,i) => `P${i+1}`),
         datasets: [
-          { label: 'Curtidas', data: topPosts.map(p => p.likeCount||0), backgroundColor: 'rgba(111,203,236,0.72)', borderRadius: 4 },
-          { label: 'Comentários', data: topPosts.map(p => p.commentsCount||0), backgroundColor: 'rgba(74,222,156,0.72)', borderRadius: 4 }
+          { label: 'Curtidas', data: topPosts.map(p => p.likeCount||0), backgroundColor: 'rgba(108,141,245,0.72)', borderRadius: 4 },
+          { label: 'Comentários', data: topPosts.map(p => p.commentsCount||0), backgroundColor: 'rgba(74,222,200,0.72)', borderRadius: 4 }
         ]
       },
       options: { responsive: true, maintainAspectRatio: false, ...chartDefaults }
